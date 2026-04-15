@@ -1,6 +1,6 @@
 {
   "name": "@farisulhaq/universal-picker",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "A lightweight, zero-dependency date range picker. Supports calendar, accounting period, and double-date modes.",
   "main": "UniversalPicker.js",
   "browser": "UniversalPicker.js",
