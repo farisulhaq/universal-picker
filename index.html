@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Implementasi Universal Picker</title>
+    <style>
+        /* Styling tambahan hanya untuk layouting halaman */
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding-top: 50px; background: #f4f7f6; }
+        .container { width: 400px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #444; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Report Filter</h2>
+        
+        <div style="margin-bottom: 20px;">
+            <label>Periode Akuntansi:</label>
+            <input type="text" id="input-accounting" placeholder="Pilih periode..." readonly>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label>Tanggal Umum:</label>
+            <input type="text" id="input-standard" placeholder="Pilih tanggal..." readonly>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label>Tanggal Double Date:</label>
+            <input type="text" id="input-doubledate" placeholder="Pilih tanggal..." readonly>
+        </div>
+    </div>
+
+    <script src="UniversalPicker.js"></script>
+
+    <script>
+        // Data accountingConfig yang dinamis (bisa hasil fetch API)
+        const myAccountingData = [
+            { label: 'P01-2026', start: new Date(2025, 11, 29), end: new Date(2026, 0, 23) },
+            { label: 'P02-2026', start: new Date(2026, 0, 24), end: new Date(2026, 1, 20) },
+            { label: 'P03-2026', start: new Date(2026, 1, 21), end: new Date(2026, 2, 20) }
+        ];
+
+        // Jalankan Picker untuk Accounting
+        const accPicker = new UniversalPicker('input-accounting', {
+            mode: 'custom',
+            accountingConfig: myAccountingData,
+            primaryColor: '#059669' // Warna hijau emerald
+        });
+
+        // Jalankan Picker untuk Standard
+            const stdPicker = new UniversalPicker('input-standard', {
+                mode: 'default',
+                primaryColor: '#2563eb' // Warna biru royal
+            });
+
+            // Jalankan Picker untuk Double Date
+            const ddPicker = new UniversalPicker('input-doubledate', {
+                mode: 'doubledate',
+                primaryColor: '#2563eb' // Warna biru royal
+            });
+    </script>
+</body>
+</html>
