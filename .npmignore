@@ -1,0 +1,11 @@
+src/
+docs/
+.git/
+.gitignore
+rollup.config.mjs
+build.js
+UniversalPicker.js
+UniversalPicker.min.js
+CNAME
+node_modules/
+*.log

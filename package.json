@@ -1,20 +1,31 @@
 {
   "name": "@farisulhaq/universal-picker",
-  "version": "2.0.4",
+  "version": "3.0.0",
   "description": "A lightweight, zero-dependency date range picker. Supports calendar, accounting period, and double-date modes.",
-  "main": "UniversalPicker.js",
-  "browser": "UniversalPicker.js",
-  "unpkg": "UniversalPicker.min.js",
-  "jsdelivr": "UniversalPicker.min.js",
+  "main": "dist/universal-picker.js",
+  "module": "dist/universal-picker.esm.js",
+  "browser": "dist/universal-picker.min.js",
+  "unpkg": "dist/universal-picker.min.js",
+  "jsdelivr": "dist/universal-picker.min.js",
+  "types": "types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/universal-picker.esm.js",
+      "require": "./dist/universal-picker.js",
+      "types": "./types/index.d.ts",
+      "default": "./dist/universal-picker.js"
+    }
+  },
+  "sideEffects": false,
   "files": [
-    "UniversalPicker.js",
-    "UniversalPicker.min.js",
+    "dist/",
+    "types/",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
-    "minify": "node build.js",
-    "prepublishOnly": "node build.js"
+    "build": "rollup -c rollup.config.mjs",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -31,12 +42,18 @@
     "picker",
     "vanilla-js",
     "no-dependency",
-    "lightweight"
+    "lightweight",
+    "typescript"
   ],
   "author": "farisulhaq",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/farisulhaq/universal-picker/issues"
   },
-  "homepage": "https://github.com/farisulhaq/universal-picker#readme"
+  "homepage": "https://github.com/farisulhaq/universal-picker#readme",
+  "devDependencies": {
+    "@rollup/plugin-replace": "^6.0.3",
+    "@rollup/plugin-terser": "^1.0.0",
+    "rollup": "^4.60.1"
+  }
 }

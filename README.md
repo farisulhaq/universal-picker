@@ -23,7 +23,8 @@ A lightweight, zero-dependency date range picker library for the web. Supports c
 - **Auto-positioning**: Smart positioning relative to viewport
 - **Programmatic API**: Full control via JavaScript methods
 - **Events & Callbacks**: `onShow`, `onHide`, `onApply`, `onCancel`, `onChange`, `onSelect`
-- **CDN Ready**: UMD module (works with `<script>`, AMD, CommonJS)
+- **CDN Ready**: UMD + ESM builds (works with `<script>`, AMD, CommonJS, ES Modules)
+- **TypeScript**: Full type definitions included
 - **Zero Dependencies**: No jQuery, no external libraries
 
 ## Installation
@@ -32,12 +33,12 @@ A lightweight, zero-dependency date range picker library for the web. Supports c
 
 **jsDelivr:**
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@farisulhaq/universal-picker@2.0.4/UniversalPicker.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@farisulhaq/universal-picker@3/dist/universal-picker.min.js"></script>
 ```
 
 **unpkg:**
 ```html
-<script src="https://unpkg.com/@farisulhaq/universal-picker@2.0.4/UniversalPicker.min.js"></script>
+<script src="https://unpkg.com/@farisulhaq/universal-picker@3/dist/universal-picker.min.js"></script>
 ```
 
 ### NPM
@@ -57,7 +58,7 @@ import UniversalPicker from '@farisulhaq/universal-picker';
 ### Local
 
 ```html
-<script src="path/to/UniversalPicker.js"></script>
+<script src="dist/universal-picker.min.js"></script>
 ```
 
 ## Quick Start
@@ -579,8 +580,9 @@ Each picker is fully independent. You can create as many as needed:
 
 - **GitHub**: https://github.com/farisulhaq/universal-picker
 - **npm**: https://www.npmjs.com/package/@farisulhaq/universal-picker
-- **CDN (jsDelivr)**: https://cdn.jsdelivr.net/npm/@farisulhaq/universal-picker@2.0.4/UniversalPicker.min.js
-- **CDN (unpkg)**: https://unpkg.com/@farisulhaq/universal-picker@2.0.4/UniversalPicker.min.js
+- **CDN (jsDelivr)**: https://cdn.jsdelivr.net/npm/@farisulhaq/universal-picker@3/dist/universal-picker.min.js
+- **CDN (unpkg)**: https://unpkg.com/@farisulhaq/universal-picker@3/dist/universal-picker.min.js
+- **Live Demo**: https://picker.afhaq.com/
 
 ## License
 
