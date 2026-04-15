@@ -1,6 +1,12 @@
 # UniversalPicker.js
 
+[![npm version](https://img.shields.io/npm/v/@farisulhaq/universal-picker.svg)](https://www.npmjs.com/package/@farisulhaq/universal-picker)
+[![license](https://img.shields.io/npm/l/@farisulhaq/universal-picker.svg)](https://github.com/farisulhaq/universal-picker/blob/master/LICENSE)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/@farisulhaq/universal-picker)](https://bundlephobia.com/package/@farisulhaq/universal-picker)
+
 A lightweight, zero-dependency date range picker library for the web. Supports calendar, accounting period, and double-date modes. Designed for CDN usage with UMD module support.
+
+**[Live Demo & Playground](https://farisulhaq.github.io/universal-picker/)**
 
 ## Features
 
@@ -24,24 +30,34 @@ A lightweight, zero-dependency date range picker library for the web. Supports c
 
 ### CDN (Recommended)
 
+**jsDelivr:**
 ```html
-<script src="https://your-cdn.com/UniversalPicker.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@farisulhaq/universal-picker@2.0.0/UniversalPicker.min.js"></script>
+```
+
+**unpkg:**
+```html
+<script src="https://unpkg.com/@farisulhaq/universal-picker@2.0.0/UniversalPicker.min.js"></script>
+```
+
+### NPM
+
+```bash
+npm install @farisulhaq/universal-picker
+```
+
+```js
+// CommonJS
+const UniversalPicker = require('@farisulhaq/universal-picker');
+
+// ES Module
+import UniversalPicker from '@farisulhaq/universal-picker';
 ```
 
 ### Local
 
 ```html
 <script src="path/to/UniversalPicker.js"></script>
-```
-
-### NPM / Module
-
-```js
-// CommonJS
-const UniversalPicker = require('./UniversalPicker');
-
-// ES Module
-import UniversalPicker from './UniversalPicker';
 ```
 
 ## Quick Start
@@ -559,6 +575,13 @@ Each picker is fully independent. You can create as many as needed:
 - Edge 79+
 - Opera 47+
 
+## Links
+
+- **GitHub**: https://github.com/farisulhaq/universal-picker
+- **npm**: https://www.npmjs.com/package/@farisulhaq/universal-picker
+- **CDN (jsDelivr)**: https://cdn.jsdelivr.net/npm/@farisulhaq/universal-picker@2.0.0/UniversalPicker.min.js
+- **CDN (unpkg)**: https://unpkg.com/@farisulhaq/universal-picker@2.0.0/UniversalPicker.min.js
+
 ## License
 
-MIT License. Free for personal and commercial use.
+MIT License. Free for personal and commercial use. See [LICENSE](./LICENSE).
