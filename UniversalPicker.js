@@ -799,7 +799,7 @@
 
         // Click outside to close
         Utils.on(document, 'click', function (e) {
-            if (self.isShowing && !self.container.contains(e.target) && e.target !== self.element) {
+            if (self.isShowing && !self.container.contains(e.target) && !self.element.contains(e.target)) {
                 self.hide();
             }
         }, ns);
@@ -1451,10 +1451,15 @@
             }
         }
 
-        if (this.element.tagName === 'INPUT') {
+        if (this.element.tagName === 'INPUT' || this.element.tagName === 'TEXTAREA') {
             this.element.value = val;
         } else {
-            this.element.innerText = val;
+            var span = this.element.querySelector('span');
+            if (span) {
+                span.innerText = val;
+            } else {
+                this.element.innerText = val;
+            }
         }
     };
 

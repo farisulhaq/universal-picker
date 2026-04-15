@@ -178,7 +178,7 @@ UniversalPicker.prototype._bindEvents = function () {
     }
 
     Utils.on(document, 'click', function (e) {
-        if (self.isShowing && !self.container.contains(e.target) && e.target !== self.element) {
+        if (self.isShowing && !self.container.contains(e.target) && !self.element.contains(e.target)) {
             self.hide();
         }
     }, ns);
@@ -687,8 +687,17 @@ UniversalPicker.prototype._updateInputValue = function () {
         }
     }
 
-    if (this.element.tagName === 'INPUT') { this.element.value = val; }
-    else { this.element.innerText = val; }
+    if (this.element.tagName === 'INPUT' || this.element.tagName === 'TEXTAREA') {
+        this.element.value = val;
+    } else {
+        // For non-input elements (div, button, etc), look for a <span> inside
+        var span = this.element.querySelector('span');
+        if (span) {
+            span.innerText = val;
+        } else {
+            this.element.innerText = val;
+        }
+    }
 };
 
 UniversalPicker.prototype._updatePosition = function () {
