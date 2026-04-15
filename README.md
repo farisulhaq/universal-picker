@@ -32,12 +32,12 @@ A lightweight, zero-dependency date range picker library for the web. Supports c
 
 **jsDelivr:**
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@farisulhaq/universal-picker@2.0.2/UniversalPicker.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@farisulhaq/universal-picker@2.0.3/UniversalPicker.min.js"></script>
 ```
 
 **unpkg:**
 ```html
-<script src="https://unpkg.com/@farisulhaq/universal-picker@2.0.2/UniversalPicker.min.js"></script>
+<script src="https://unpkg.com/@farisulhaq/universal-picker@2.0.3/UniversalPicker.min.js"></script>
 ```
 
 ### NPM
@@ -579,8 +579,8 @@ Each picker is fully independent. You can create as many as needed:
 
 - **GitHub**: https://github.com/farisulhaq/universal-picker
 - **npm**: https://www.npmjs.com/package/@farisulhaq/universal-picker
-- **CDN (jsDelivr)**: https://cdn.jsdelivr.net/npm/@farisulhaq/universal-picker@2.0.2/UniversalPicker.min.js
-- **CDN (unpkg)**: https://unpkg.com/@farisulhaq/universal-picker@2.0.2/UniversalPicker.min.js
+- **CDN (jsDelivr)**: https://cdn.jsdelivr.net/npm/@farisulhaq/universal-picker@2.0.3/UniversalPicker.min.js
+- **CDN (unpkg)**: https://unpkg.com/@farisulhaq/universal-picker@2.0.3/UniversalPicker.min.js
 
 ## License
 
