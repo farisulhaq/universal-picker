@@ -2,64 +2,1026 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Implementasi Universal Picker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniversalPicker.js - Documentation &amp; Playground</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* Styling tambahan hanya untuk layouting halaman */
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding-top: 50px; background: #f4f7f6; }
-        .container { width: 400px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        label { display: block; margin-bottom: 8px; font-weight: bold; color: #444; }
-        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; box-sizing: border-box; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --c-bg: #f8fafc;
+            --c-surface: #ffffff;
+            --c-border: #e2e8f0;
+            --c-border-light: #f1f5f9;
+            --c-text: #0f172a;
+            --c-text-2: #475569;
+            --c-text-3: #94a3b8;
+            --c-primary: #2563eb;
+            --c-primary-soft: #eff6ff;
+            --c-green: #059669;
+            --c-green-soft: #ecfdf5;
+            --c-purple: #7c3aed;
+            --c-purple-soft: #f5f3ff;
+            --c-amber: #d97706;
+            --c-amber-soft: #fffbeb;
+            --c-red: #dc2626;
+            --c-code-bg: #0f172a;
+            --c-code-text: #e2e8f0;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 20px rgba(0,0,0,0.04);
+            --shadow-lg: 0 4px 40px rgba(0,0,0,0.08);
+            --font: 'Inter', system-ui, -apple-system, sans-serif;
+            --mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--c-bg);
+            color: var(--c-text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Hero ─────────────────────────────────────── */
+        .hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            padding: 80px 24px 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(37,99,235,0.15) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+            margin-bottom: 24px;
+            backdrop-filter: blur(8px);
+        }
+        .hero-badge span { color: var(--c-primary); }
+        .hero h1 {
+            font-size: clamp(32px, 5vw, 52px);
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+        .hero h1 em {
+            font-style: normal;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            font-size: 16px;
+            color: #94a3b8;
+            max-width: 520px;
+            margin: 0 auto 32px;
+            line-height: 1.7;
+        }
+        .hero-features {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .hero-tag {
+            padding: 5px 14px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #cbd5e1;
+        }
+
+        /* ── Layout ───────────────────────────────────── */
+        .wrap {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .section {
+            padding: 48px 0;
+        }
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--c-primary);
+            margin-bottom: 8px;
+        }
+        .section-title {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+        .section-desc {
+            font-size: 15px;
+            color: var(--c-text-2);
+            margin-bottom: 36px;
+            max-width: 560px;
+        }
+
+        /* ── Card ─────────────────────────────────────── */
+        .card {
+            background: var(--c-surface);
+            border: 1px solid var(--c-border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 28px;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--c-border);
+        }
+        .card-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .card-icon.blue   { background: var(--c-primary-soft); color: var(--c-primary); }
+        .card-icon.green  { background: var(--c-green-soft);   color: var(--c-green); }
+        .card-icon.purple { background: var(--c-purple-soft);  color: var(--c-purple); }
+        .card-icon.amber  { background: var(--c-amber-soft);   color: var(--c-amber); }
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+        }
+        .card-subtitle {
+            font-size: 12px;
+            color: var(--c-text-3);
+            margin-top: 1px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .badge-blue   { background: var(--c-primary-soft); color: var(--c-primary); }
+        .badge-green  { background: var(--c-green-soft);   color: var(--c-green); }
+        .badge-purple { background: var(--c-purple-soft);  color: var(--c-purple); }
+        .badge-amber  { background: var(--c-amber-soft);   color: var(--c-amber); }
+
+        /* ── Tabs ─────────────────────────────────────── */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--c-border);
+            background: #fafbfc;
+        }
+        .tab-btn {
+            padding: 11px 20px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font);
+            color: var(--c-text-3);
+            background: none;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.15s;
+        }
+        .tab-btn:hover { color: var(--c-text-2); }
+        .tab-btn.active {
+            color: var(--c-primary);
+        }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--c-primary);
+            border-radius: 2px 2px 0 0;
+        }
+        .tab-panel {
+            display: none;
+        }
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* ── Preview Area ─────────────────────────────── */
+        .preview-area {
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            min-height: 120px;
+            background: linear-gradient(180deg, #fafbfc 0%, #fff 100%);
+        }
+        .preview-area label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--c-text-3);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .preview-area input[type="text"] {
+            width: 100%;
+            max-width: 380px;
+            padding: 12px 16px;
+            border: 1px solid var(--c-border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: var(--font);
+            color: var(--c-text);
+            background: #fff;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .preview-area input[type="text"]:hover {
+            border-color: #cbd5e1;
+        }
+        .preview-area input[type="text"]:focus {
+            border-color: var(--c-primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+        }
+        .output-line {
+            font-size: 12px;
+            font-family: var(--mono);
+            color: var(--c-text-3);
+            background: var(--c-border-light);
+            padding: 8px 16px;
+            border-radius: 6px;
+            max-width: 380px;
+            width: 100%;
+            text-align: center;
+            min-height: 18px;
+            word-break: break-all;
+        }
+
+        /* ── Code Block ───────────────────────────────── */
+        .code-wrap {
+            position: relative;
+        }
+        .code-block {
+            background: var(--c-code-bg);
+            color: var(--c-code-text);
+            padding: 20px 24px;
+            font-family: var(--mono);
+            font-size: 12.5px;
+            line-height: 1.75;
+            overflow-x: auto;
+            white-space: pre;
+            tab-size: 2;
+            -moz-tab-size: 2;
+        }
+        .code-block .kw  { color: #c084fc; }
+        .code-block .fn  { color: #60a5fa; }
+        .code-block .str { color: #86efac; }
+        .code-block .num { color: #fbbf24; }
+        .code-block .cm  { color: #64748b; font-style: italic; }
+        .code-block .pr  { color: #f472b6; }
+        .code-block .op  { color: #94a3b8; }
+        .code-block .obj { color: #67e8f9; }
+
+        .btn-copy {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: all 0.15s;
+            z-index: 2;
+        }
+        .btn-copy:hover {
+            background: rgba(255,255,255,0.14);
+            color: #e2e8f0;
+        }
+        .btn-copy.copied {
+            background: rgba(34,197,94,0.15);
+            border-color: rgba(34,197,94,0.3);
+            color: #4ade80;
+        }
+
+        /* ── API Demo ─────────────────────────────────── */
+        .api-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 24px;
+        }
+        .api-btn {
+            padding: 9px 18px;
+            border: 1px solid var(--c-border);
+            border-radius: 8px;
+            background: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--mono);
+            color: var(--c-text-2);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .api-btn:hover {
+            border-color: var(--c-primary);
+            color: var(--c-primary);
+            background: var(--c-primary-soft);
+        }
+        .api-btn.danger {
+            color: var(--c-red);
+            border-color: #fecaca;
+        }
+        .api-btn.danger:hover {
+            background: #fef2f2;
+            border-color: var(--c-red);
+        }
+        .api-output {
+            margin: 0 24px 24px;
+            padding: 12px 16px;
+            background: var(--c-code-bg);
+            border-radius: 8px;
+            font-family: var(--mono);
+            font-size: 12px;
+            color: #86efac;
+            min-height: 20px;
+        }
+
+        /* ── Install Section ──────────────────────────── */
+        .install-box {
+            background: var(--c-code-bg);
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .install-box code {
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--c-code-text);
+        }
+        .install-box code span { color: #86efac; }
+        .install-copy {
+            padding: 5px 12px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: var(--font);
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .install-copy:hover { background: rgba(255,255,255,0.14); color: #e2e8f0; }
+        .install-copy.copied { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.3); color: #4ade80; }
+
+        /* ── Footer ───────────────────────────────────── */
+        .site-footer {
+            text-align: center;
+            padding: 40px 24px;
+            border-top: 1px solid var(--c-border);
+            color: var(--c-text-3);
+            font-size: 13px;
+        }
+        .site-footer strong { color: var(--c-text-2); font-weight: 600; }
+
+        /* ── Responsive ───────────────────────────────── */
+        @media (max-width: 640px) {
+            .hero { padding: 56px 20px 40px; }
+            .hero h1 { font-size: 28px; }
+            .section { padding: 32px 0; }
+            .section-title { font-size: 22px; }
+            .card-header { padding: 16px 18px; }
+            .preview-area { padding: 24px 18px; }
+            .code-block { padding: 16px 18px; font-size: 11.5px; }
+            .api-grid { padding: 18px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>Report Filter</h2>
-        
-        <div style="margin-bottom: 20px;">
-            <label>Periode Akuntansi:</label>
-            <input type="text" id="input-accounting" placeholder="Pilih periode..." readonly>
-        </div>
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!-- HERO                                                                -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<header class="hero">
+    <div class="hero-badge">
+        <span>v2.0.0</span> &middot; Zero Dependencies &middot; 8KB gzipped
+    </div>
+    <h1>Universal<em>Picker</em>.js</h1>
+    <p>
+        A lightweight, professional date range picker for the web.
+        Calendar, Accounting Period, dan DoubleDate modes &mdash; siap pakai via CDN.
+    </p>
+    <div class="hero-features">
+        <span class="hero-tag">Date Range</span>
+        <span class="hero-tag">Single Date</span>
+        <span class="hero-tag">Accounting Periods</span>
+        <span class="hero-tag">Double Date</span>
+        <span class="hero-tag">Predefined Ranges</span>
+        <span class="hero-tag">Min/Max Date</span>
+        <span class="hero-tag">Locale Support</span>
+        <span class="hero-tag">Responsive</span>
+    </div>
+</header>
 
-        <div style="margin-bottom: 20px;">
-            <label>Tanggal Umum:</label>
-            <input type="text" id="input-standard" placeholder="Pilih tanggal..." readonly>
-        </div>
+<div class="wrap">
 
-        <div style="margin-bottom: 20px;">
-            <label>Tanggal Double Date:</label>
-            <input type="text" id="input-doubledate" placeholder="Pilih tanggal..." readonly>
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!-- INSTALL                                                             -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<section class="section">
+    <div class="section-label">Getting Started</div>
+    <div class="section-title">Installation</div>
+    <div class="section-desc">Cukup satu file. Tidak perlu build tools, bundler, atau dependency lain.</div>
+
+    <div class="install-box">
+        <code>&lt;script src=<span>"UniversalPicker.js"</span>&gt;&lt;/script&gt;</code>
+        <button class="install-copy" onclick="copyText(this, '&lt;script src=&quot;UniversalPicker.js&quot;&gt;&lt;/script&gt;')">Copy</button>
+    </div>
+    <div class="install-box">
+        <code><span>npm install</span> universal-picker</code>
+        <button class="install-copy" onclick="copyText(this, 'npm install universal-picker')">Copy</button>
+    </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!-- 1. DATE RANGE PICKER                                                -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<section class="section">
+    <div class="section-label">Examples</div>
+    <div class="section-title">Live Playground</div>
+    <div class="section-desc">Klik input untuk mencoba. Lihat tab "Code" untuk copy-paste ke project kamu.</div>
+
+    <!-- Card 1: Date Range -->
+    <div class="card" id="card-range">
+        <div class="card-header">
+            <div class="card-header-left">
+                <div class="card-icon blue">&#128197;</div>
+                <div>
+                    <div class="card-title">Date Range Picker</div>
+                    <div class="card-subtitle">Sidebar ranges, week numbers, dropdowns</div>
+                </div>
+            </div>
+            <span class="badge badge-blue">Default</span>
+        </div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('range','preview')">Preview</button>
+            <button class="tab-btn" onclick="switchTab('range','code')">Code</button>
+        </div>
+        <div class="tab-panel active" data-tab="range-preview">
+            <div class="preview-area">
+                <label>Pilih Rentang Tanggal</label>
+                <input type="text" id="input-range" placeholder="Klik untuk memilih tanggal...">
+                <div class="output-line" id="output-range">Belum ada tanggal dipilih</div>
+            </div>
+        </div>
+        <div class="tab-panel" data-tab="range-code">
+            <div class="code-wrap">
+                <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+                <div class="code-block"><span class="kw">var</span> picker = <span class="kw">new</span> <span class="fn">UniversalPicker</span>(<span class="str">'#daterange'</span>, {
+  <span class="pr">mode</span>: <span class="str">'default'</span>,
+  <span class="pr">format</span>: <span class="str">'DD MMM YYYY'</span>,
+  <span class="pr">showCalendars</span>: <span class="num">2</span>,
+  <span class="pr">showDropdowns</span>: <span class="num">true</span>,
+  <span class="pr">showWeekNumbers</span>: <span class="num">true</span>,
+  <span class="pr">firstDay</span>: <span class="num">1</span>,
+  <span class="pr">ranges</span>: {
+    <span class="str">'Hari Ini'</span>:        [<span class="obj">today</span>, <span class="obj">today</span>],
+    <span class="str">'7 Hari Terakhir'</span>: [<span class="fn">daysAgo</span>(<span class="num">6</span>), <span class="obj">today</span>],
+    <span class="str">'Bulan Ini'</span>:        [<span class="fn">startOfMonth</span>(), <span class="fn">endOfMonth</span>()],
+    <span class="str">'Bulan Lalu'</span>:       [<span class="fn">startOfLastMonth</span>(), <span class="fn">endOfLastMonth</span>()]
+  },
+  <span class="pr">locale</span>: {
+    <span class="pr">applyLabel</span>: <span class="str">'Terapkan'</span>,
+    <span class="pr">cancelLabel</span>: <span class="str">'Batal'</span>,
+    <span class="pr">customRangeLabel</span>: <span class="str">'Pilih Sendiri'</span>
+  },
+  <span class="pr">onApply</span>: <span class="kw">function</span> (<span class="obj">data</span>) {
+    <span class="obj">console</span>.<span class="fn">log</span>(<span class="obj">data</span>.<span class="pr">startDate</span>, <span class="obj">data</span>.<span class="pr">endDate</span>);
+  }
+});</div>
+            </div>
         </div>
     </div>
 
-    <script src="UniversalPicker.js"></script>
+    <!-- Card 2: Single Date -->
+    <div class="card" id="card-single">
+        <div class="card-header">
+            <div class="card-header-left">
+                <div class="card-icon purple">&#128198;</div>
+                <div>
+                    <div class="card-title">Single Date Picker</div>
+                    <div class="card-subtitle">Auto-apply, min/max, disabled weekends</div>
+                </div>
+            </div>
+            <span class="badge badge-purple">Single</span>
+        </div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('single','preview')">Preview</button>
+            <button class="tab-btn" onclick="switchTab('single','code')">Code</button>
+        </div>
+        <div class="tab-panel active" data-tab="single-preview">
+            <div class="preview-area">
+                <label>Tanggal Transaksi</label>
+                <input type="text" id="input-single" placeholder="Klik untuk memilih tanggal...">
+                <div class="output-line" id="output-single">Belum ada tanggal dipilih</div>
+            </div>
+        </div>
+        <div class="tab-panel" data-tab="single-code">
+            <div class="code-wrap">
+                <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+                <div class="code-block"><span class="kw">var</span> picker = <span class="kw">new</span> <span class="fn">UniversalPicker</span>(<span class="str">'#single'</span>, {
+  <span class="pr">singleDatePicker</span>: <span class="num">true</span>,
+  <span class="pr">autoApply</span>: <span class="num">true</span>,
+  <span class="pr">format</span>: <span class="str">'DD MMMM YYYY'</span>,
+  <span class="pr">showCalendars</span>: <span class="num">1</span>,
+  <span class="pr">showDropdowns</span>: <span class="num">true</span>,
+  <span class="pr">minDate</span>: <span class="kw">new</span> <span class="fn">Date</span>(<span class="num">2025</span>, <span class="num">0</span>, <span class="num">1</span>),
+  <span class="pr">maxDate</span>: <span class="kw">new</span> <span class="fn">Date</span>(<span class="num">2027</span>, <span class="num">11</span>, <span class="num">31</span>),
+  <span class="cm">// Disable weekends</span>
+  <span class="pr">isInvalidDate</span>: <span class="kw">function</span> (<span class="obj">date</span>) {
+    <span class="kw">var</span> day = <span class="obj">date</span>.<span class="fn">getDay</span>();
+    <span class="kw">return</span> day === <span class="num">0</span> || day === <span class="num">6</span>;
+  },
+  <span class="pr">onApply</span>: <span class="kw">function</span> (<span class="obj">data</span>) {
+    <span class="obj">console</span>.<span class="fn">log</span>(<span class="obj">data</span>.<span class="pr">startDate</span>);
+  }
+});</div>
+            </div>
+        </div>
+    </div>
 
-    <script>
-        // Data accountingConfig yang dinamis (bisa hasil fetch API)
-        const myAccountingData = [
-            { label: 'P01-2026', start: new Date(2025, 11, 29), end: new Date(2026, 0, 23) },
-            { label: 'P02-2026', start: new Date(2026, 0, 24), end: new Date(2026, 1, 20) },
-            { label: 'P03-2026', start: new Date(2026, 1, 21), end: new Date(2026, 2, 20) }
-        ];
+    <!-- Card 3: Accounting -->
+    <div class="card" id="card-accounting">
+        <div class="card-header">
+            <div class="card-header-left">
+                <div class="card-icon green">&#128200;</div>
+                <div>
+                    <div class="card-title">Accounting Period</div>
+                    <div class="card-subtitle">Custom periods + sidebar ranges</div>
+                </div>
+            </div>
+            <span class="badge badge-green">Custom</span>
+        </div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('accounting','preview')">Preview</button>
+            <button class="tab-btn" onclick="switchTab('accounting','code')">Code</button>
+        </div>
+        <div class="tab-panel active" data-tab="accounting-preview">
+            <div class="preview-area">
+                <label>Periode Akuntansi</label>
+                <input type="text" id="input-accounting" placeholder="Klik untuk memilih periode...">
+                <div class="output-line" id="output-accounting">Belum ada periode dipilih</div>
+            </div>
+        </div>
+        <div class="tab-panel" data-tab="accounting-code">
+            <div class="code-wrap">
+                <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+                <div class="code-block"><span class="kw">var</span> picker = <span class="kw">new</span> <span class="fn">UniversalPicker</span>(<span class="str">'#accounting'</span>, {
+  <span class="pr">mode</span>: <span class="str">'custom'</span>,
+  <span class="pr">format</span>: <span class="str">'DD MMM YYYY'</span>,
+  <span class="pr">showCalendars</span>: <span class="num">2</span>,
+  <span class="pr">accountingConfig</span>: [
+    { <span class="pr">label</span>: <span class="str">'P01 - Jan'</span>, <span class="pr">start</span>: <span class="kw">new</span> <span class="fn">Date</span>(<span class="num">2025</span>,<span class="num">11</span>,<span class="num">29</span>), <span class="pr">end</span>: <span class="kw">new</span> <span class="fn">Date</span>(<span class="num">2026</span>,<span class="num">0</span>,<span class="num">25</span>) },
+    { <span class="pr">label</span>: <span class="str">'P02 - Feb'</span>, <span class="pr">start</span>: <span class="kw">new</span> <span class="fn">Date</span>(<span class="num">2026</span>,<span class="num">0</span>,<span class="num">26</span>), <span class="pr">end</span>: <span class="kw">new</span> <span class="fn">Date</span>(<span class="num">2026</span>,<span class="num">1</span>,<span class="num">22</span>) },
+    <span class="cm">// ... more periods</span>
+  ],
+  <span class="pr">ranges</span>: {
+    <span class="str">'Hari Ini'</span>:  [<span class="obj">today</span>, <span class="obj">today</span>],
+    <span class="str">'Bulan Ini'</span>: [<span class="fn">startOfMonth</span>(), <span class="fn">endOfMonth</span>()]
+  },
+  <span class="pr">locale</span>: {
+    <span class="pr">customRangeLabel</span>: <span class="str">'Pilih Periode'</span>  <span class="cm">// switches back to accounting view</span>
+  }
+});</div>
+            </div>
+        </div>
+    </div>
 
-        // Jalankan Picker untuk Accounting
-        const accPicker = new UniversalPicker('input-accounting', {
-            mode: 'custom',
-            accountingConfig: myAccountingData,
-            primaryColor: '#059669' // Warna hijau emerald
-        });
+    <!-- Card 4: DoubleDate -->
+    <div class="card" id="card-doubledate">
+        <div class="card-header">
+            <div class="card-header-left">
+                <div class="card-icon amber">&#128336;</div>
+                <div>
+                    <div class="card-title">Double Date</div>
+                    <div class="card-subtitle">Quick pick 1/1, 2/2, ... 12/12</div>
+                </div>
+            </div>
+            <span class="badge badge-amber">DoubleDate</span>
+        </div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('doubledate','preview')">Preview</button>
+            <button class="tab-btn" onclick="switchTab('doubledate','code')">Code</button>
+        </div>
+        <div class="tab-panel active" data-tab="doubledate-preview">
+            <div class="preview-area">
+                <label>Tanggal Double Date</label>
+                <input type="text" id="input-doubledate" placeholder="Klik untuk memilih...">
+                <div class="output-line" id="output-doubledate">Belum ada tanggal dipilih</div>
+            </div>
+        </div>
+        <div class="tab-panel" data-tab="doubledate-code">
+            <div class="code-wrap">
+                <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+                <div class="code-block"><span class="kw">var</span> picker = <span class="kw">new</span> <span class="fn">UniversalPicker</span>(<span class="str">'#doubledate'</span>, {
+  <span class="pr">mode</span>: <span class="str">'doubledate'</span>,
+  <span class="pr">format</span>: <span class="str">'DD/MM/YYYY'</span>,
+  <span class="pr">autoApply</span>: <span class="num">true</span>,
+  <span class="pr">onApply</span>: <span class="kw">function</span> (<span class="obj">data</span>) {
+    <span class="obj">console</span>.<span class="fn">log</span>(<span class="str">'Double date:'</span>, <span class="obj">data</span>.<span class="pr">startDate</span>);
+  }
+});</div>
+            </div>
+        </div>
+    </div>
+</section>
 
-        // Jalankan Picker untuk Standard
-            const stdPicker = new UniversalPicker('input-standard', {
-                mode: 'default',
-                primaryColor: '#2563eb' // Warna biru royal
-            });
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!-- API PLAYGROUND                                                      -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<section class="section">
+    <div class="section-label">API</div>
+    <div class="section-title">Programmatic Control</div>
+    <div class="section-desc">Semua method bisa dipanggil langsung. Klik tombol untuk mencoba pada Date Range Picker di atas.</div>
 
-            // Jalankan Picker untuk Double Date
-            const ddPicker = new UniversalPicker('input-doubledate', {
-                mode: 'doubledate',
-                primaryColor: '#2563eb' // Warna biru royal
-            });
-    </script>
+    <div class="card">
+        <div class="card-header">
+            <div class="card-header-left">
+                <div class="card-icon blue">&#9881;</div>
+                <div>
+                    <div class="card-title">Method Playground</div>
+                    <div class="card-subtitle">Target: Date Range Picker</div>
+                </div>
+            </div>
+        </div>
+        <div class="api-grid">
+            <button class="api-btn" onclick="demoSetRange()">.setDateRange()</button>
+            <button class="api-btn" onclick="demoGetRange()">.getDateRange()</button>
+            <button class="api-btn" onclick="demoShow()">.show()</button>
+            <button class="api-btn" onclick="demoHide()">.hide()</button>
+            <button class="api-btn" onclick="demoSetMin()">.setMinDate()</button>
+            <button class="api-btn" onclick="demoSetMax()">.setMaxDate()</button>
+            <button class="api-btn danger" onclick="demoDestroy()">.destroy()</button>
+        </div>
+        <div class="api-output" id="output-api">// output akan muncul di sini</div>
+    </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!-- OPTIONS REFERENCE                                                   -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<section class="section">
+    <div class="section-label">Reference</div>
+    <div class="section-title">All Options</div>
+    <div class="section-desc">Daftar lengkap opsi yang tersedia.</div>
+
+    <div class="card">
+        <div class="tab-panel active">
+            <div class="code-wrap">
+                <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+                <div class="code-block"><span class="kw">var</span> picker = <span class="kw">new</span> <span class="fn">UniversalPicker</span>(<span class="str">'#element'</span>, {
+  <span class="pr">mode</span>:             <span class="str">'default'</span>,     <span class="cm">// 'default' | 'custom' | 'doubledate'</span>
+  <span class="pr">startDate</span>:        <span class="num">null</span>,          <span class="cm">// Date | string</span>
+  <span class="pr">endDate</span>:          <span class="num">null</span>,          <span class="cm">// Date | string</span>
+  <span class="pr">minDate</span>:          <span class="num">null</span>,          <span class="cm">// minimum selectable date</span>
+  <span class="pr">maxDate</span>:          <span class="num">null</span>,          <span class="cm">// maximum selectable date</span>
+  <span class="pr">singleDatePicker</span>: <span class="num">false</span>,         <span class="cm">// true = single date, no range</span>
+  <span class="pr">showDropdowns</span>:    <span class="num">false</span>,         <span class="cm">// month/year dropdown selectors</span>
+  <span class="pr">showCalendars</span>:    <span class="num">2</span>,             <span class="cm">// 1 or 2 calendar panes</span>
+  <span class="pr">format</span>:           <span class="str">'DD/MM/YYYY'</span>,  <span class="cm">// DD, MM, MMM, MMMM, YYYY</span>
+  <span class="pr">separator</span>:        <span class="str">' - '</span>,         <span class="cm">// between start &amp; end in input</span>
+  <span class="pr">autoApply</span>:        <span class="num">false</span>,         <span class="cm">// auto-apply on selection</span>
+  <span class="pr">showWeekNumbers</span>:  <span class="num">false</span>,         <span class="cm">// ISO week number column</span>
+  <span class="pr">firstDay</span>:         <span class="num">0</span>,             <span class="cm">// 0=Sun, 1=Mon, ... 6=Sat</span>
+  <span class="pr">opens</span>:            <span class="str">'auto'</span>,        <span class="cm">// 'left' | 'right' | 'center' | 'auto'</span>
+  <span class="pr">drops</span>:            <span class="str">'auto'</span>,        <span class="cm">// 'up' | 'down' | 'auto'</span>
+  <span class="pr">ranges</span>:           {},             <span class="cm">// { 'Label': [startDate, endDate] }</span>
+  <span class="pr">accountingConfig</span>: [],             <span class="cm">// [{ label, start, end }]</span>
+  <span class="pr">isInvalidDate</span>:    <span class="num">null</span>,          <span class="cm">// function(date) => boolean</span>
+  <span class="pr">isCustomDate</span>:     <span class="num">null</span>,          <span class="cm">// function(date) => className</span>
+
+  <span class="cm">// Callbacks</span>
+  <span class="pr">onShow</span>:   <span class="kw">function</span>(<span class="obj">data</span>) {},  <span class="cm">// picker opened</span>
+  <span class="pr">onHide</span>:   <span class="kw">function</span>(<span class="obj">data</span>) {},  <span class="cm">// picker closed</span>
+  <span class="pr">onApply</span>:  <span class="kw">function</span>(<span class="obj">data</span>) {},  <span class="cm">// { startDate, endDate }</span>
+  <span class="pr">onCancel</span>: <span class="kw">function</span>(<span class="obj">data</span>) {},  <span class="cm">// reverted to previous</span>
+  <span class="pr">onChange</span>: <span class="kw">function</span>(<span class="obj">data</span>) {},  <span class="cm">// value changed</span>
+  <span class="pr">onSelect</span>: <span class="kw">function</span>(<span class="obj">data</span>) {},  <span class="cm">// date clicked</span>
+
+  <span class="cm">// Theme</span>
+  <span class="pr">theme</span>: {
+    <span class="pr">primaryColor</span>: <span class="str">'#2563eb'</span>,
+    <span class="pr">rangeColor</span>:   <span class="str">'#eff6ff'</span>,
+    <span class="pr">borderColor</span>:  <span class="str">'#e2e8f0'</span>,
+    <span class="pr">textColor</span>:    <span class="str">'#1e293b'</span>,
+    <span class="pr">bgColor</span>:      <span class="str">'#ffffff'</span>,
+    <span class="pr">sidebarBg</span>:    <span class="str">'#f8fafc'</span>,
+  },
+
+  <span class="cm">// Locale</span>
+  <span class="pr">locale</span>: {
+    <span class="pr">applyLabel</span>:       <span class="str">'Apply'</span>,
+    <span class="pr">cancelLabel</span>:      <span class="str">'Cancel'</span>,
+    <span class="pr">customRangeLabel</span>: <span class="str">'Custom Range'</span>,
+    <span class="pr">monthNames</span>:       [<span class="str">'January'</span>, <span class="str">'February'</span>, ...],
+    <span class="pr">dayNamesShort</span>:    [<span class="str">'Su'</span>, <span class="str">'Mo'</span>, <span class="str">'Tu'</span>, ...],
+  }
+});</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+</div><!-- /wrap -->
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!-- FOOTER                                                              -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<footer class="site-footer">
+    <strong>UniversalPicker.js</strong> v2.0.0 &mdash; MIT License &mdash; Zero dependencies
+</footer>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<!-- SCRIPTS                                                             -->
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<script src="UniversalPicker.js"></script>
+<script>
+// ─── Helpers ───────────────────────────────────────────────────────
+var today = new Date();
+today.setHours(0, 0, 0, 0);
+
+function fmt(d) {
+    if (!d) return 'null';
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+// ─── Tab Switching ─────────────────────────────────────────────────
+function switchTab(card, tab) {
+    var el = document.getElementById('card-' + card);
+    if (!el) return;
+    var btns = el.querySelectorAll('.tab-btn');
+    var panels = el.querySelectorAll('.tab-panel');
+    for (var i = 0; i < btns.length; i++) {
+        btns[i].classList.remove('active');
+        if (panels[i]) panels[i].classList.remove('active');
+    }
+    var target = tab === 'preview' ? 0 : 1;
+    if (btns[target]) btns[target].classList.add('active');
+    if (panels[target]) panels[target].classList.add('active');
+}
+
+// ─── Copy Helpers ──────────────────────────────────────────────────
+function copyCode(btn) {
+    var block = btn.parentElement.querySelector('.code-block');
+    if (!block) return;
+    var text = block.innerText;
+    navigator.clipboard.writeText(text).then(function () {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function () {
+            btn.textContent = 'Copy';
+            btn.classList.remove('copied');
+        }, 2000);
+    });
+}
+
+function copyText(btn, text) {
+    // Decode HTML entities for clipboard
+    var tmp = document.createElement('textarea');
+    tmp.innerHTML = text;
+    navigator.clipboard.writeText(tmp.value).then(function () {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function () {
+            btn.textContent = 'Copy';
+            btn.classList.remove('copied');
+        }, 2000);
+    });
+}
+
+// ─── 1. Date Range Picker ──────────────────────────────────────────
+var rangePicker = new UniversalPicker('#input-range', {
+    mode: 'default',
+    format: 'DD MMM YYYY',
+    showCalendars: 2,
+    showDropdowns: true,
+    showWeekNumbers: true,
+    firstDay: 1,
+    opens: 'auto',
+    drops: 'auto',
+    ranges: {
+        'Hari Ini': [today, today],
+        'Kemarin': [
+            new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1),
+            new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1)
+        ],
+        '7 Hari Terakhir': [
+            new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6),
+            today
+        ],
+        '30 Hari Terakhir': [
+            new Date(today.getFullYear(), today.getMonth(), today.getDate() - 29),
+            today
+        ],
+        'Bulan Ini': [
+            new Date(today.getFullYear(), today.getMonth(), 1),
+            new Date(today.getFullYear(), today.getMonth() + 1, 0)
+        ],
+        'Bulan Lalu': [
+            new Date(today.getFullYear(), today.getMonth() - 1, 1),
+            new Date(today.getFullYear(), today.getMonth(), 0)
+        ]
+    },
+    locale: {
+        applyLabel: 'Terapkan',
+        cancelLabel: 'Batal',
+        customRangeLabel: 'Pilih Sendiri',
+        monthNames: ['Januari','Februari','Maret','April','Mei','Juni',
+                     'Juli','Agustus','September','Oktober','November','Desember'],
+        monthNamesShort: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
+        dayNamesShort: ['Mi','Se','Se','Ra','Ka','Ju','Sa']
+    },
+    onApply: function (data) {
+        document.getElementById('output-range').innerText =
+            fmt(data.startDate) + '  ~  ' + fmt(data.endDate);
+    }
+});
+
+// ─── 2. Single Date Picker ────────────────────────────────────────
+var singlePicker = new UniversalPicker('#input-single', {
+    mode: 'default',
+    singleDatePicker: true,
+    autoApply: true,
+    format: 'DD MMMM YYYY',
+    showCalendars: 1,
+    showDropdowns: true,
+    firstDay: 1,
+    minDate: new Date(2025, 0, 1),
+    maxDate: new Date(2027, 11, 31),
+    locale: {
+        monthNames: ['Januari','Februari','Maret','April','Mei','Juni',
+                     'Juli','Agustus','September','Oktober','November','Desember'],
+        monthNamesShort: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
+        dayNamesShort: ['Mi','Se','Se','Ra','Ka','Ju','Sa']
+    },
+    isInvalidDate: function (date) {
+        var day = date.getDay();
+        return day === 0 || day === 6;
+    },
+    onApply: function (data) {
+        document.getElementById('output-single').innerText = fmt(data.startDate);
+    }
+});
+
+// ─── 3. Accounting Period Picker ───────────────────────────────────
+var accountingData = [
+    { label: 'P01 - Jan 2026',  start: new Date(2025,11,29), end: new Date(2026,0,25) },
+    { label: 'P02 - Feb 2026',  start: new Date(2026,0,26),  end: new Date(2026,1,22) },
+    { label: 'P03 - Mar 2026',  start: new Date(2026,1,23),  end: new Date(2026,2,22) },
+    { label: 'P04 - Apr 2026',  start: new Date(2026,2,23),  end: new Date(2026,3,19) },
+    { label: 'P05 - Mei 2026',  start: new Date(2026,3,20),  end: new Date(2026,4,24) },
+    { label: 'P06 - Jun 2026',  start: new Date(2026,4,25),  end: new Date(2026,5,21) },
+    { label: 'P07 - Jul 2026',  start: new Date(2026,5,22),  end: new Date(2026,6,19) },
+    { label: 'P08 - Agu 2026',  start: new Date(2026,6,20),  end: new Date(2026,7,23) },
+    { label: 'P09 - Sep 2026',  start: new Date(2026,7,24),  end: new Date(2026,8,20) },
+    { label: 'P10 - Okt 2026',  start: new Date(2026,8,21),  end: new Date(2026,9,18) },
+    { label: 'P11 - Nov 2026',  start: new Date(2026,9,19),  end: new Date(2026,10,22) },
+    { label: 'P12 - Des 2026',  start: new Date(2026,10,23), end: new Date(2026,11,27) }
+];
+
+var accPicker = new UniversalPicker('#input-accounting', {
+    mode: 'custom',
+    format: 'DD MMM YYYY',
+    showCalendars: 2,
+    accountingConfig: accountingData,
+    ranges: {
+        'Hari Ini': [today, today],
+        'Kemarin': [
+            new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1),
+            new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1)
+        ],
+        '7 Hari Terakhir': [
+            new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6),
+            today
+        ],
+        'Bulan Ini': [
+            new Date(today.getFullYear(), today.getMonth(), 1),
+            new Date(today.getFullYear(), today.getMonth() + 1, 0)
+        ],
+        'Bulan Lalu': [
+            new Date(today.getFullYear(), today.getMonth() - 1, 1),
+            new Date(today.getFullYear(), today.getMonth(), 0)
+        ]
+    },
+    locale: {
+        applyLabel: 'Terapkan',
+        cancelLabel: 'Batal',
+        customRangeLabel: 'Pilih Periode',
+        monthNames: ['Januari','Februari','Maret','April','Mei','Juni',
+                     'Juli','Agustus','September','Oktober','November','Desember'],
+        monthNamesShort: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
+        dayNamesShort: ['Mi','Se','Se','Ra','Ka','Ju','Sa']
+    },
+    onApply: function (data) {
+        document.getElementById('output-accounting').innerText =
+            fmt(data.startDate) + '  ~  ' + fmt(data.endDate);
+    }
+});
+
+// ─── 4. DoubleDate Picker ──────────────────────────────────────────
+var ddPicker = new UniversalPicker('#input-doubledate', {
+    mode: 'doubledate',
+    format: 'DD/MM/YYYY',
+    autoApply: true,
+    onApply: function (data) {
+        document.getElementById('output-doubledate').innerText = fmt(data.startDate);
+    }
+});
+
+// ─── 5. API Playground ─────────────────────────────────────────────
+function apiLog(msg) {
+    document.getElementById('output-api').innerText = '> ' + msg;
+}
+
+function demoSetRange() {
+    rangePicker.setDateRange(new Date(2026, 0, 1), new Date(2026, 2, 31));
+    apiLog('setDateRange(2026-01-01, 2026-03-31) — input updated');
+}
+function demoGetRange() {
+    var r = rangePicker.getDateRange();
+    apiLog('getDateRange() => ' + fmt(r.startDate) + ' ~ ' + fmt(r.endDate));
+}
+function demoShow() {
+    rangePicker.show();
+    apiLog('show() — picker opened');
+}
+function demoHide() {
+    rangePicker.hide();
+    apiLog('hide() — picker closed');
+}
+function demoSetMin() {
+    rangePicker.setMinDate(new Date(2026, 3, 1));
+    apiLog('setMinDate(2026-04-01) — dates before April disabled');
+}
+function demoSetMax() {
+    rangePicker.setMaxDate(new Date(2026, 5, 30));
+    apiLog('setMaxDate(2026-06-30) — dates after June disabled');
+}
+function demoDestroy() {
+    rangePicker.destroy();
+    apiLog('destroy() — picker removed. Click input to verify.');
+}
+
+// ─── DOM Events (console) ──────────────────────────────────────────
+document.getElementById('input-range').addEventListener('up.apply', function (e) {
+    console.log('[up.apply]', e.detail);
+});
+</script>
 </body>
 </html>

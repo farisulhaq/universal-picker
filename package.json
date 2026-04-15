@@ -1,0 +1,42 @@
+{
+  "name": "@farisulhaq/universal-picker",
+  "version": "2.0.0",
+  "description": "A lightweight, zero-dependency date range picker. Supports calendar, accounting period, and double-date modes.",
+  "main": "UniversalPicker.js",
+  "browser": "UniversalPicker.js",
+  "unpkg": "UniversalPicker.min.js",
+  "jsdelivr": "UniversalPicker.min.js",
+  "files": [
+    "UniversalPicker.js",
+    "UniversalPicker.min.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "minify": "node build.js",
+    "prepublishOnly": "node build.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/farisulhaq/universal-picker.git"
+  },
+  "keywords": [
+    "datepicker",
+    "daterangepicker",
+    "date-range-picker",
+    "calendar",
+    "date-picker",
+    "accounting",
+    "doubledate",
+    "picker",
+    "vanilla-js",
+    "no-dependency",
+    "lightweight"
+  ],
+  "author": "farisulhaq",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/farisulhaq/universal-picker/issues"
+  },
+  "homepage": "https://github.com/farisulhaq/universal-picker#readme"
+}
