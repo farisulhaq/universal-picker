@@ -51,8 +51,17 @@ export var DEFAULTS = {
     // Predefined ranges (sidebar shortcuts)
     ranges: null,
 
+    // Custom title for the nav bar (null = auto-generate based on mode)
+    title: null,
+
     // Accounting config for 'custom' mode
     accountingConfig: [],
+
+    // Time picker
+    timePicker: false,
+    timePicker24Hour: true,
+    timePickerIncrement: 1,
+    timePickerSeconds: false,
 
     // Theme / colors
     theme: {

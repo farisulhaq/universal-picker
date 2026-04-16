@@ -54,6 +54,16 @@ export interface UniversalPickerOptions {
     drops?: 'up' | 'down' | 'auto';
     ranges?: Record<string, [Date, Date] | (() => [Date, Date])> | null;
     accountingConfig?: AccountingPeriod[];
+    /** Custom title for the nav bar (null = auto-generate based on mode) */
+    title?: string | null;
+    /** Enable time picker */
+    timePicker?: boolean;
+    /** Use 24-hour format (default: true) */
+    timePicker24Hour?: boolean;
+    /** Minute increment step (default: 1) */
+    timePickerIncrement?: number;
+    /** Show seconds selector (default: false) */
+    timePickerSeconds?: boolean;
     theme?: UniversalPickerTheme;
     locale?: UniversalPickerLocale;
     isInvalidDate?: ((date: Date) => boolean) | null;

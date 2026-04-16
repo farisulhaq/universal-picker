@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -112,6 +112,35 @@
             font-size: 12px;
             font-weight: 500;
             color: #cbd5e1;
+        }
+
+        /* ── Language Toggle ──────────────────────────── */
+        .lang-toggle {
+            display: inline-flex;
+            gap: 0;
+            background: rgba(255,255,255,0.08);
+            border-radius: 100px;
+            margin-top: 24px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .lang-btn {
+            padding: 6px 18px;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: var(--font);
+            color: #94a3b8;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .lang-btn:hover {
+            color: #cbd5e1;
+        }
+        .lang-btn.active {
+            background: var(--c-primary);
+            color: #fff;
         }
 
         /* ── Layout ───────────────────────────────────── */
@@ -397,6 +426,7 @@
             justify-content: space-between;
             gap: 12px;
             margin-bottom: 16px;
+            overflow-x: auto;
         }
         .install-box code {
             font-family: var(--mono);
@@ -440,6 +470,8 @@
             .preview-area { padding: 24px 18px; }
             .code-block { padding: 16px 18px; font-size: 11.5px; }
             .api-grid { padding: 18px; }
+            .install-box { flex-direction: column; align-items: flex-start; }
+            .install-box code { font-size: 11px; word-break: break-all; white-space: normal; }
         }
     </style>
 </head>
@@ -450,22 +482,27 @@
 <!-- ════════════════════════════════════════════════════════════════════ -->
 <header class="hero">
     <div class="hero-badge">
-        <span>v3.0.0</span> &middot; Zero Dependencies &middot; 25KB gzipped
+        <span>v3.1.0</span> &middot; Zero Dependencies &middot; 25KB gzipped
     </div>
     <h1>Universal<em>Picker</em>.js</h1>
-    <p>
+    <p data-i18n="heroDesc">
         A lightweight, professional date range picker for the web.
-        Calendar, Accounting Period, dan DoubleDate modes &mdash; siap pakai via CDN.
+        Calendar, Accounting Period, and DoubleDate modes &mdash; ready to use via CDN.
     </p>
     <div class="hero-features">
         <span class="hero-tag">Date Range</span>
         <span class="hero-tag">Single Date</span>
         <span class="hero-tag">Accounting Periods</span>
         <span class="hero-tag">Double Date</span>
+        <span class="hero-tag">Time Picker</span>
         <span class="hero-tag">Predefined Ranges</span>
         <span class="hero-tag">Min/Max Date</span>
         <span class="hero-tag">Locale Support</span>
         <span class="hero-tag">Responsive</span>
+    </div>
+    <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('id')">ID</button>
     </div>
 </header>
 
@@ -475,13 +512,13 @@
 <!-- INSTALL                                                             -->
 <!-- ════════════════════════════════════════════════════════════════════ -->
 <section class="section">
-    <div class="section-label">Getting Started</div>
-    <div class="section-title">Installation</div>
-    <div class="section-desc">Cukup satu file. Tidak perlu build tools, bundler, atau dependency lain.</div>
+    <div class="section-label" data-i18n="installLabel">Getting Started</div>
+    <div class="section-title" data-i18n="installTitle">Installation</div>
+    <div class="section-desc" data-i18n="installDesc">Just one file. No build tools, bundler, or other dependencies needed.</div>
 
     <div class="install-box">
-        <code>&lt;script src=<span>"https://cdn.jsdelivr.net/npm/@farisulhaq/universal-picker@3/dist/universal-picker.min.js"</span>&gt;&lt;/script&gt;</code>
-        <button class="install-copy" onclick="copyText(this, '&lt;script src=&quot;https://cdn.jsdelivr.net/npm/@farisulhaq/universal-picker@3/dist/universal-picker.min.js&quot;&gt;&lt;/script&gt;')">Copy</button>
+        <code>&lt;script src=<span>"https://cdn.jsdelivr.net/npm/@farisulhaq/universal-picker@3.0.1/dist/universal-picker.min.js"</span>&gt;&lt;/script&gt;</code>
+        <button class="install-copy" onclick="copyText(this, '&lt;script src=&quot;https://cdn.jsdelivr.net/npm/@farisulhaq/universal-picker@3.0.1/dist/universal-picker.min.js&quot;&gt;&lt;/script&gt;')">Copy</button>
     </div>
     <div class="install-box">
         <code><span>npm install</span> @farisulhaq/universal-picker</code>
@@ -493,9 +530,9 @@
 <!-- 1. DATE RANGE PICKER                                                -->
 <!-- ════════════════════════════════════════════════════════════════════ -->
 <section class="section">
-    <div class="section-label">Examples</div>
-    <div class="section-title">Live Playground</div>
-    <div class="section-desc">Klik input untuk mencoba. Lihat tab "Code" untuk copy-paste ke project kamu.</div>
+    <div class="section-label" data-i18n="examplesLabel">Examples</div>
+    <div class="section-title" data-i18n="examplesTitle">Live Playground</div>
+    <div class="section-desc" data-i18n="examplesDesc">Click input to try. See the "Code" tab to copy-paste into your project.</div>
 
     <!-- Card 1: Date Range -->
     <div class="card" id="card-range">
@@ -515,9 +552,9 @@
         </div>
         <div class="tab-panel active" data-tab="range-preview">
             <div class="preview-area">
-                <label>Pilih Rentang Tanggal</label>
-                <input type="text" id="input-range" placeholder="Klik untuk memilih tanggal...">
-                <div class="output-line" id="output-range">Belum ada tanggal dipilih</div>
+                <label data-i18n="rangeLabel">Select Date Range</label>
+                <input type="text" id="input-range" data-i18n-placeholder="rangePlaceholder" placeholder="Click to select dates...">
+                <div class="output-line" id="output-range" data-i18n="rangeOutput">No date selected</div>
             </div>
         </div>
         <div class="tab-panel" data-tab="range-code">
@@ -567,9 +604,9 @@
         </div>
         <div class="tab-panel active" data-tab="single-preview">
             <div class="preview-area">
-                <label>Tanggal Transaksi</label>
-                <input type="text" id="input-single" placeholder="Klik untuk memilih tanggal...">
-                <div class="output-line" id="output-single">Belum ada tanggal dipilih</div>
+                <label data-i18n="singleLabel">Transaction Date</label>
+                <input type="text" id="input-single" data-i18n-placeholder="singlePlaceholder" placeholder="Click to select date...">
+                <div class="output-line" id="output-single" data-i18n="singleOutput">No date selected</div>
             </div>
         </div>
         <div class="tab-panel" data-tab="single-code">
@@ -614,9 +651,9 @@
         </div>
         <div class="tab-panel active" data-tab="accounting-preview">
             <div class="preview-area">
-                <label>Periode Akuntansi</label>
-                <input type="text" id="input-accounting" placeholder="Klik untuk memilih periode...">
-                <div class="output-line" id="output-accounting">Belum ada periode dipilih</div>
+                <label data-i18n="accLabel">Accounting Period</label>
+                <input type="text" id="input-accounting" data-i18n-placeholder="accPlaceholder" placeholder="Click to select period...">
+                <div class="output-line" id="output-accounting" data-i18n="accOutput">No period selected</div>
             </div>
         </div>
         <div class="tab-panel" data-tab="accounting-code">
@@ -661,9 +698,9 @@
         </div>
         <div class="tab-panel active" data-tab="doubledate-preview">
             <div class="preview-area">
-                <label>Tanggal Double Date</label>
-                <input type="text" id="input-doubledate" placeholder="Klik untuk memilih...">
-                <div class="output-line" id="output-doubledate">Belum ada tanggal dipilih</div>
+                <label data-i18n="ddLabel">Double Date</label>
+                <input type="text" id="input-doubledate" data-i18n-placeholder="ddPlaceholder" placeholder="Click to select...">
+                <div class="output-line" id="output-doubledate" data-i18n="ddOutput">No date selected</div>
             </div>
         </div>
         <div class="tab-panel" data-tab="doubledate-code">
@@ -680,15 +717,58 @@
             </div>
         </div>
     </div>
+
+    <!-- Card 5: Time Picker -->
+    <div class="card" id="card-time">
+        <div class="card-header">
+            <div class="card-header-left">
+                <div class="card-icon blue">&#9201;</div>
+                <div>
+                    <div class="card-title">Time Picker</div>
+                    <div class="card-subtitle">Date range with time selection</div>
+                </div>
+            </div>
+            <span class="badge badge-blue">Time</span>
+        </div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('time','preview')">Preview</button>
+            <button class="tab-btn" onclick="switchTab('time','code')">Code</button>
+        </div>
+        <div class="tab-panel active" data-tab="time-preview">
+            <div class="preview-area">
+                <label data-i18n="timeLabel">Select Date &amp; Time</label>
+                <input type="text" id="input-time" data-i18n-placeholder="timePlaceholder" placeholder="Click to select date &amp; time...">
+                <div class="output-line" id="output-time" data-i18n="timeOutput">No date selected</div>
+            </div>
+        </div>
+        <div class="tab-panel" data-tab="time-code">
+            <div class="code-wrap">
+                <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+                <div class="code-block"><span class="kw">var</span> picker = <span class="kw">new</span> <span class="fn">UniversalPicker</span>(<span class="str">'#datetime'</span>, {
+  <span class="pr">mode</span>: <span class="str">'default'</span>,
+  <span class="pr">format</span>: <span class="str">'DD/MM/YYYY HH:mm'</span>,
+  <span class="pr">showCalendars</span>: <span class="num">2</span>,
+  <span class="pr">showDropdowns</span>: <span class="num">true</span>,
+  <span class="pr">timePicker</span>: <span class="num">true</span>,
+  <span class="pr">timePicker24Hour</span>: <span class="num">true</span>,
+  <span class="pr">timePickerIncrement</span>: <span class="num">15</span>,
+  <span class="pr">firstDay</span>: <span class="num">1</span>,
+  <span class="pr">onApply</span>: <span class="kw">function</span> (<span class="obj">data</span>) {
+    <span class="obj">console</span>.<span class="fn">log</span>(<span class="obj">data</span>.<span class="pr">startDate</span>, <span class="obj">data</span>.<span class="pr">endDate</span>);
+  }
+});</div>
+            </div>
+        </div>
+    </div>
 </section>
 
 <!-- ════════════════════════════════════════════════════════════════════ -->
 <!-- API PLAYGROUND                                                      -->
 <!-- ════════════════════════════════════════════════════════════════════ -->
 <section class="section">
-    <div class="section-label">API</div>
-    <div class="section-title">Programmatic Control</div>
-    <div class="section-desc">Semua method bisa dipanggil langsung. Klik tombol untuk mencoba pada Date Range Picker di atas.</div>
+    <div class="section-label" data-i18n="apiLabel">API</div>
+    <div class="section-title" data-i18n="apiTitle">Programmatic Control</div>
+    <div class="section-desc" data-i18n="apiDesc">All methods can be called directly. Click buttons to try on the Date Range Picker above.</div>
 
     <div class="card">
         <div class="card-header">
@@ -709,7 +789,7 @@
             <button class="api-btn" onclick="demoSetMax()">.setMaxDate()</button>
             <button class="api-btn danger" onclick="demoDestroy()">.destroy()</button>
         </div>
-        <div class="api-output" id="output-api">// output akan muncul di sini</div>
+        <div class="api-output" id="output-api" data-i18n="apiOutput">// output will appear here</div>
     </div>
 </section>
 
@@ -717,9 +797,9 @@
 <!-- OPTIONS REFERENCE                                                   -->
 <!-- ════════════════════════════════════════════════════════════════════ -->
 <section class="section">
-    <div class="section-label">Reference</div>
-    <div class="section-title">All Options</div>
-    <div class="section-desc">Daftar lengkap opsi yang tersedia.</div>
+    <div class="section-label" data-i18n="refLabel">Reference</div>
+    <div class="section-title" data-i18n="refTitle">All Options</div>
+    <div class="section-desc" data-i18n="refDesc">Complete list of available options.</div>
 
     <div class="card">
         <div class="tab-panel active">
@@ -741,10 +821,17 @@
   <span class="pr">firstDay</span>:         <span class="num">0</span>,             <span class="cm">// 0=Sun, 1=Mon, ... 6=Sat</span>
   <span class="pr">opens</span>:            <span class="str">'auto'</span>,        <span class="cm">// 'left' | 'right' | 'center' | 'auto'</span>
   <span class="pr">drops</span>:            <span class="str">'auto'</span>,        <span class="cm">// 'up' | 'down' | 'auto'</span>
+  <span class="pr">title</span>:            <span class="str">''</span>,            <span class="cm">// title text shown in picker header</span>
   <span class="pr">ranges</span>:           {},             <span class="cm">// { 'Label': [startDate, endDate] }</span>
   <span class="pr">accountingConfig</span>: [],             <span class="cm">// [{ label, start, end }]</span>
   <span class="pr">isInvalidDate</span>:    <span class="num">null</span>,          <span class="cm">// function(date) => boolean</span>
   <span class="pr">isCustomDate</span>:     <span class="num">null</span>,          <span class="cm">// function(date) => className</span>
+
+  <span class="cm">// Time Picker</span>
+  <span class="pr">timePicker</span>:          <span class="num">false</span>,      <span class="cm">// enable time selection</span>
+  <span class="pr">timePicker24Hour</span>:    <span class="num">false</span>,      <span class="cm">// use 24-hour format instead of AM/PM</span>
+  <span class="pr">timePickerIncrement</span>: <span class="num">1</span>,          <span class="cm">// minute increment step (e.g. 15)</span>
+  <span class="pr">timePickerSeconds</span>:   <span class="num">false</span>,      <span class="cm">// show seconds selector</span>
 
   <span class="cm">// Callbacks</span>
   <span class="pr">onShow</span>:   <span class="kw">function</span>(<span class="obj">data</span>) {},  <span class="cm">// picker opened</span>
@@ -784,7 +871,7 @@
 <!-- FOOTER                                                              -->
 <!-- ════════════════════════════════════════════════════════════════════ -->
 <footer class="site-footer">
-    <strong>UniversalPicker.js</strong> v3.0.0 &mdash; MIT License &mdash; Zero dependencies &mdash;
+    <strong>UniversalPicker.js</strong> v3.1.0 &mdash; MIT License &mdash; Zero dependencies &mdash;
     <a href="https://github.com/farisulhaq/universal-picker" style="color:var(--c-primary);text-decoration:none;">GitHub</a> &middot;
     <a href="https://www.npmjs.com/package/@farisulhaq/universal-picker" style="color:var(--c-primary);text-decoration:none;">npm</a>
 </footer>
@@ -794,13 +881,124 @@
 <!-- ════════════════════════════════════════════════════════════════════ -->
 <script src="universal-picker.js"></script>
 <script>
+// ─── i18n ──────────────────────────────────────────────────────────
+var i18n = {
+    en: {
+        heroDesc: 'A lightweight, professional date range picker for the web. Calendar, Accounting Period, and DoubleDate modes \u2014 ready to use via CDN.',
+        installLabel: 'Getting Started',
+        installTitle: 'Installation',
+        installDesc: 'Just one file. No build tools, bundler, or other dependencies needed.',
+        examplesLabel: 'Examples',
+        examplesTitle: 'Live Playground',
+        examplesDesc: 'Click input to try. See the "Code" tab to copy-paste into your project.',
+        rangeLabel: 'Select Date Range',
+        rangePlaceholder: 'Click to select dates...',
+        rangeOutput: 'No date selected',
+        singleLabel: 'Transaction Date',
+        singlePlaceholder: 'Click to select date...',
+        singleOutput: 'No date selected',
+        accLabel: 'Accounting Period',
+        accPlaceholder: 'Click to select period...',
+        accOutput: 'No period selected',
+        ddLabel: 'Double Date',
+        ddPlaceholder: 'Click to select...',
+        ddOutput: 'No date selected',
+        timeLabel: 'Select Date & Time',
+        timePlaceholder: 'Click to select date & time...',
+        timeOutput: 'No date selected',
+        apiLabel: 'API',
+        apiTitle: 'Programmatic Control',
+        apiDesc: 'All methods can be called directly. Click buttons to try on the Date Range Picker above.',
+        apiOutput: '// output will appear here',
+        refLabel: 'Reference',
+        refTitle: 'All Options',
+        refDesc: 'Complete list of available options.'
+    },
+    id: {
+        heroDesc: 'Date range picker yang ringan dan profesional untuk web. Calendar, Accounting Period, dan DoubleDate modes \u2014 siap pakai via CDN.',
+        installLabel: 'Memulai',
+        installTitle: 'Instalasi',
+        installDesc: 'Cukup satu file. Tidak perlu build tools, bundler, atau dependency lain.',
+        examplesLabel: 'Contoh',
+        examplesTitle: 'Live Playground',
+        examplesDesc: 'Klik input untuk mencoba. Lihat tab "Code" untuk copy-paste ke project kamu.',
+        rangeLabel: 'Pilih Rentang Tanggal',
+        rangePlaceholder: 'Klik untuk memilih tanggal...',
+        rangeOutput: 'Belum ada tanggal dipilih',
+        singleLabel: 'Tanggal Transaksi',
+        singlePlaceholder: 'Klik untuk memilih tanggal...',
+        singleOutput: 'Belum ada tanggal dipilih',
+        accLabel: 'Periode Akuntansi',
+        accPlaceholder: 'Klik untuk memilih periode...',
+        accOutput: 'Belum ada periode dipilih',
+        ddLabel: 'Tanggal Double Date',
+        ddPlaceholder: 'Klik untuk memilih...',
+        ddOutput: 'Belum ada tanggal dipilih',
+        timeLabel: 'Pilih Tanggal & Waktu',
+        timePlaceholder: 'Klik untuk memilih tanggal & waktu...',
+        timeOutput: 'Belum ada tanggal dipilih',
+        apiLabel: 'API',
+        apiTitle: 'Kontrol Programatik',
+        apiDesc: 'Semua method bisa dipanggil langsung. Klik tombol untuk mencoba pada Date Range Picker di atas.',
+        apiOutput: '// output akan muncul di sini',
+        refLabel: 'Referensi',
+        refTitle: 'Semua Opsi',
+        refDesc: 'Daftar lengkap opsi yang tersedia.'
+    }
+};
+
+var currentLang = localStorage.getItem('up-lang') || 'en';
+
+function setLang(lang) {
+    currentLang = lang;
+    localStorage.setItem('up-lang', lang);
+    var strings = i18n[lang];
+    if (!strings) return;
+
+    // Update all data-i18n text elements
+    var els = document.querySelectorAll('[data-i18n]');
+    for (var i = 0; i < els.length; i++) {
+        var key = els[i].getAttribute('data-i18n');
+        if (strings[key] !== undefined) {
+            els[i].textContent = strings[key];
+        }
+    }
+
+    // Update all data-i18n-placeholder elements
+    var placeholders = document.querySelectorAll('[data-i18n-placeholder]');
+    for (var j = 0; j < placeholders.length; j++) {
+        var pKey = placeholders[j].getAttribute('data-i18n-placeholder');
+        if (strings[pKey] !== undefined) {
+            placeholders[j].placeholder = strings[pKey];
+        }
+    }
+
+    // Update lang toggle buttons
+    var btns = document.querySelectorAll('.lang-btn');
+    for (var k = 0; k < btns.length; k++) {
+        btns[k].classList.remove('active');
+        if (btns[k].textContent.trim().toLowerCase() === lang) {
+            btns[k].classList.add('active');
+        }
+    }
+}
+
 // ─── Helpers ───────────────────────────────────────────────────────
 var today = new Date();
 today.setHours(0, 0, 0, 0);
 
+function pad(n) {
+    return n < 10 ? '0' + n : '' + n;
+}
+
 function fmt(d) {
     if (!d) return 'null';
     return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function fmtTime(d) {
+    if (!d) return 'null';
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
 }
 
 // ─── Tab Switching ─────────────────────────────────────────────────
@@ -986,7 +1184,22 @@ var ddPicker = new UniversalPicker('#input-doubledate', {
     }
 });
 
-// ─── 5. API Playground ─────────────────────────────────────────────
+// ─── 5. Time Picker ────────────────────────────────────────────────
+var timePicker = new UniversalPicker('#input-time', {
+    mode: 'default',
+    format: 'DD MMM YYYY HH:mm',
+    showCalendars: 2,
+    showDropdowns: true,
+    timePicker: true,
+    timePicker24Hour: true,
+    timePickerIncrement: 15,
+    firstDay: 1,
+    onApply: function (data) {
+        document.getElementById('output-time').innerText = fmtTime(data.startDate) + '  ~  ' + fmtTime(data.endDate);
+    }
+});
+
+// ─── 6. API Playground ─────────────────────────────────────────────
 function apiLog(msg) {
     document.getElementById('output-api').innerText = '> ' + msg;
 }
@@ -1024,6 +1237,9 @@ function demoDestroy() {
 document.getElementById('input-range').addEventListener('up.apply', function (e) {
     console.log('[up.apply]', e.detail);
 });
+
+// ─── Apply saved language on load ──────────────────────────────────
+setLang(currentLang);
 </script>
 </body>
 </html>

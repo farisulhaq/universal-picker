@@ -23,13 +23,39 @@ export var Utils = {
         var months = locale.monthNames;
         var monthsShort = locale.monthNamesShort;
         var pad = function (n) { return n < 10 ? '0' + n : '' + n; };
+        var h24 = d.getHours();
+        var h12 = h24 % 12 || 12;
 
-        return format
-            .replace('YYYY', d.getFullYear())
-            .replace('MMMM', months[d.getMonth()])
-            .replace('MMM', monthsShort[d.getMonth()])
-            .replace('MM', pad(d.getMonth() + 1))
-            .replace('DD', pad(d.getDate()));
+        // Use placeholders to avoid token collision (e.g. 'A' in 'April')
+        var result = format;
+        var ph = {};
+        var idx = 0;
+        var placeholder = function (val) {
+            var key = '\x00' + (idx++) + '\x00';
+            ph[key] = val;
+            return key;
+        };
+
+        // Replace longest tokens first, store as placeholders
+        result = result
+            .replace('YYYY', placeholder('' + d.getFullYear()))
+            .replace('MMMM', placeholder(months[d.getMonth()]))
+            .replace('MMM', placeholder(monthsShort[d.getMonth()]))
+            .replace('MM', placeholder(pad(d.getMonth() + 1)))
+            .replace('DD', placeholder(pad(d.getDate())))
+            .replace('HH', placeholder(pad(h24)))
+            .replace('hh', placeholder(pad(h12)))
+            .replace('mm', placeholder(pad(d.getMinutes())))
+            .replace('ss', placeholder(pad(d.getSeconds())))
+            .replace('A', placeholder(h24 >= 12 ? 'PM' : 'AM'));
+
+        // Restore placeholders
+        for (var key in ph) {
+            if (ph.hasOwnProperty(key)) {
+                result = result.replace(key, ph[key]);
+            }
+        }
+        return result;
     },
 
     /**

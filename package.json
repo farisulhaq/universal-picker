@@ -1,6 +1,6 @@
 {
   "name": "@farisulhaq/universal-picker",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "A lightweight, zero-dependency date range picker. Supports calendar, accounting period, and double-date modes.",
   "main": "dist/universal-picker.js",
   "module": "dist/universal-picker.esm.js",

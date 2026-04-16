@@ -1,5 +1,5 @@
 /**
- * UniversalPicker.js v3.0.1
+ * UniversalPicker.js v3.1.0
  * A lightweight, zero-dependency date range picker.
  * https://github.com/farisulhaq/universal-picker
  * @license MIT
@@ -35,13 +35,39 @@
             var months = locale.monthNames;
             var monthsShort = locale.monthNamesShort;
             var pad = function (n) { return n < 10 ? '0' + n : '' + n; };
+            var h24 = d.getHours();
+            var h12 = h24 % 12 || 12;
 
-            return format
-                .replace('YYYY', d.getFullYear())
-                .replace('MMMM', months[d.getMonth()])
-                .replace('MMM', monthsShort[d.getMonth()])
-                .replace('MM', pad(d.getMonth() + 1))
-                .replace('DD', pad(d.getDate()));
+            // Use placeholders to avoid token collision (e.g. 'A' in 'April')
+            var result = format;
+            var ph = {};
+            var idx = 0;
+            var placeholder = function (val) {
+                var key = '\x00' + (idx++) + '\x00';
+                ph[key] = val;
+                return key;
+            };
+
+            // Replace longest tokens first, store as placeholders
+            result = result
+                .replace('YYYY', placeholder('' + d.getFullYear()))
+                .replace('MMMM', placeholder(months[d.getMonth()]))
+                .replace('MMM', placeholder(monthsShort[d.getMonth()]))
+                .replace('MM', placeholder(pad(d.getMonth() + 1)))
+                .replace('DD', placeholder(pad(d.getDate())))
+                .replace('HH', placeholder(pad(h24)))
+                .replace('hh', placeholder(pad(h12)))
+                .replace('mm', placeholder(pad(d.getMinutes())))
+                .replace('ss', placeholder(pad(d.getSeconds())))
+                .replace('A', placeholder(h24 >= 12 ? 'PM' : 'AM'));
+
+            // Restore placeholders
+            for (var key in ph) {
+                if (ph.hasOwnProperty(key)) {
+                    result = result.replace(key, ph[key]);
+                }
+            }
+            return result;
         },
 
         /**
@@ -188,8 +214,17 @@
         // Predefined ranges (sidebar shortcuts)
         ranges: null,
 
+        // Custom title for the nav bar (null = auto-generate based on mode)
+        title: null,
+
         // Accounting config for 'custom' mode
         accountingConfig: [],
+
+        // Time picker
+        timePicker: false,
+        timePicker24Hour: true,
+        timePickerIncrement: 1,
+        timePickerSeconds: false,
 
         // Theme / colors
         theme: {
@@ -557,6 +592,40 @@
             '  border-color: ' + theme.primaryColor + ';',
             '}',
             '',
+            '/* Time Picker */',
+            '.up-time-row {',
+            '  display: flex;',
+            '  justify-content: center;',
+            '  align-items: center;',
+            '  gap: 24px;',
+            '  padding: 12px 20px;',
+            '  border-top: 1px solid ' + theme.borderColor + ';',
+            '  background: #fafbfc;',
+            '}',
+            '.up-time-group {',
+            '  display: flex;',
+            '  align-items: center;',
+            '  gap: 6px;',
+            '}',
+            '.up-time-label {',
+            '  font-size: 11px;',
+            '  font-weight: 600;',
+            '  color: #64748b;',
+            '  text-transform: uppercase;',
+            '  letter-spacing: 0.05em;',
+            '  margin-right: 4px;',
+            '}',
+            '.up-time-sep {',
+            '  font-size: 13px;',
+            '  font-weight: 700;',
+            '  color: #94a3b8;',
+            '}',
+            '.up-time-select {',
+            '  padding: 4px 6px;',
+            '  min-width: 48px;',
+            '  text-align: center;',
+            '}',
+            '',
             '@media (max-width: 680px) {',
             '  .up-picker {',
             '    flex-direction: column;',
@@ -692,6 +761,40 @@
         html += '<div class="up-panes"></div>';
         html += '<div class="up-doubledate-grid" style="display:none"></div>';
         html += '</div>';
+
+        // Time picker row
+        if (opts.timePicker) {
+            html += '<div class="up-time-row">';
+            html += '<div class="up-time-group">';
+            html += '<label class="up-time-label">Start</label>';
+            html += '<select class="up-select up-time-select up-time-start-hour"></select>';
+            html += '<span class="up-time-sep">:</span>';
+            html += '<select class="up-select up-time-select up-time-start-min"></select>';
+            if (opts.timePickerSeconds) {
+                html += '<span class="up-time-sep">:</span>';
+                html += '<select class="up-select up-time-select up-time-start-sec"></select>';
+            }
+            if (!opts.timePicker24Hour) {
+                html += '<select class="up-select up-time-select up-time-start-ampm"></select>';
+            }
+            html += '</div>';
+            if (!opts.singleDatePicker && opts.mode !== 'doubledate') {
+                html += '<div class="up-time-group">';
+                html += '<label class="up-time-label">End</label>';
+                html += '<select class="up-select up-time-select up-time-end-hour"></select>';
+                html += '<span class="up-time-sep">:</span>';
+                html += '<select class="up-select up-time-select up-time-end-min"></select>';
+                if (opts.timePickerSeconds) {
+                    html += '<span class="up-time-sep">:</span>';
+                    html += '<select class="up-select up-time-select up-time-end-sec"></select>';
+                }
+                if (!opts.timePicker24Hour) {
+                    html += '<select class="up-select up-time-select up-time-end-ampm"></select>';
+                }
+                html += '</div>';
+            }
+            html += '</div>';
+        }
 
         if (!opts.autoApply) {
             html += '<div class="up-footer">';
@@ -873,6 +976,7 @@
             this._renderDefault(title, panes, ddGrid);
         }
 
+        this._renderTimePicker();
         this._updateFooterInfo();
         this._updateApplyState();
     };
@@ -891,7 +995,8 @@
             if (m > 11) { m -= 12; y++; }
             parts.push(locale.monthNames[m] + ' ' + y);
         }
-        titleEl.innerText = parts.join('  /  ');
+        var calTitle = parts.join('  /  ');
+        titleEl.innerText = opts.title ? opts.title + ' ' + calTitle : calTitle;
 
         for (var i = 0; i < calendars; i++) {
             var m = this.viewMonth + i, y = this.viewYear;
@@ -916,7 +1021,8 @@
                 if (m > 11) { m -= 12; y++; }
                 parts.push(locale.monthNames[m] + ' ' + y);
             }
-            titleEl.innerText = parts.join('  /  ');
+            var calTitle = parts.join('  /  ');
+            titleEl.innerText = opts.title ? opts.title + ' ' + calTitle : calTitle;
             for (var i = 0; i < calendars; i++) {
                 var m = this.viewMonth + i, y = this.viewYear;
                 if (m > 11) { m -= 12; y++; }
@@ -925,7 +1031,7 @@
             return;
         }
 
-        titleEl.innerText = 'ACCOUNTING ' + this.viewYear;
+        titleEl.innerText = (this.options.title || 'ACCOUNTING') + ' ' + this.viewYear;
         var count = this.options.showCalendars;
         for (var i = 0; i < count; i++) {
             var idx = this.viewIdx + i;
@@ -938,7 +1044,7 @@
         var self = this;
         panesEl.style.display = 'none';
         ddGridEl.style.display = 'grid';
-        titleEl.innerText = 'DOUBLE DATE ' + this.viewYear;
+        titleEl.innerText = (this.options.title || 'DOUBLE DATE') + ' ' + this.viewYear;
 
         for (var i = 1; i <= 12; i++) {
             (function (month) {
@@ -951,10 +1057,14 @@
                 }
                 btn.onclick = function (e) {
                     e.stopPropagation();
+                    if (self.options.timePicker) {
+                        var now = new Date();
+                        d.setHours(now.getHours(), now.getMinutes(), 0, 0);
+                    }
                     self.startDate = d;
                     self.endDate = new Date(d);
                     self._render();
-                    if (self.options.autoApply) { self.apply(); }
+                    if (self.options.autoApply && !self.options.timePicker) { self.apply(); }
                 };
                 ddGridEl.appendChild(btn);
             })(i);
@@ -1109,6 +1219,163 @@
         }
     };
 
+    // ─── Render Time Picker ────────────────────────────────────────────
+    UniversalPicker.prototype._renderTimePicker = function () {
+        var opts = this.options;
+        if (!opts.timePicker) return;
+
+        var self = this;
+        var now = new Date();
+
+        // Ensure dates have time component
+        if (this.startDate && this.startDate.getHours() === 0 && this.startDate.getMinutes() === 0 && !this._timeInitialized) {
+            this.startDate.setHours(now.getHours(), now.getMinutes(), 0, 0);
+            if (this.endDate) {
+                this.endDate.setHours(now.getHours(), now.getMinutes(), 0, 0);
+            }
+            this._timeInitialized = true;
+        }
+
+        var is24 = opts.timePicker24Hour;
+        var inc = opts.timePickerIncrement || 1;
+        var showSec = opts.timePickerSeconds;
+        var isSingle = opts.singleDatePicker || opts.mode === 'doubledate';
+
+        // Populate hour select
+        var populateHours = function (sel, selectedHour) {
+            sel.innerHTML = '';
+            var start = is24 ? 0 : 1;
+            for (var h = start; h < (is24 ? 24 : 13); h++) {
+                var opt = document.createElement('option');
+                opt.value = h;
+                opt.innerText = h < 10 ? '0' + h : '' + h;
+                if (is24) {
+                    if (h === selectedHour) opt.selected = true;
+                } else {
+                    var h12 = selectedHour % 12 || 12;
+                    if (h === h12) opt.selected = true;
+                }
+                sel.appendChild(opt);
+            }
+        };
+
+        // Populate minute select
+        var populateMinutes = function (sel, selectedMin) {
+            sel.innerHTML = '';
+            for (var m = 0; m < 60; m += inc) {
+                var opt = document.createElement('option');
+                opt.value = m;
+                opt.innerText = m < 10 ? '0' + m : '' + m;
+                // Select closest minute
+                if (m <= selectedMin && (m + inc) > selectedMin) opt.selected = true;
+                sel.appendChild(opt);
+            }
+        };
+
+        // Populate seconds select
+        var populateSeconds = function (sel, selectedSec) {
+            sel.innerHTML = '';
+            for (var s = 0; s < 60; s++) {
+                var opt = document.createElement('option');
+                opt.value = s;
+                opt.innerText = s < 10 ? '0' + s : '' + s;
+                if (s === selectedSec) opt.selected = true;
+                sel.appendChild(opt);
+            }
+        };
+
+        // Populate AM/PM select
+        var populateAmPm = function (sel, selectedHour) {
+            sel.innerHTML = '';
+            var amOpt = document.createElement('option');
+            amOpt.value = 'AM'; amOpt.innerText = 'AM';
+            if (selectedHour < 12) amOpt.selected = true;
+            sel.appendChild(amOpt);
+            var pmOpt = document.createElement('option');
+            pmOpt.value = 'PM'; pmOpt.innerText = 'PM';
+            if (selectedHour >= 12) pmOpt.selected = true;
+            sel.appendChild(pmOpt);
+        };
+
+        var startH = this.startDate ? this.startDate.getHours() : now.getHours();
+        var startM = this.startDate ? this.startDate.getMinutes() : now.getMinutes();
+        var startS = this.startDate ? this.startDate.getSeconds() : 0;
+
+        var sh = this.container.querySelector('.up-time-start-hour');
+        var sm = this.container.querySelector('.up-time-start-min');
+        if (sh) populateHours(sh, startH);
+        if (sm) populateMinutes(sm, startM);
+
+        if (showSec) {
+            var ss = this.container.querySelector('.up-time-start-sec');
+            if (ss) populateSeconds(ss, startS);
+        }
+        if (!is24) {
+            var sap = this.container.querySelector('.up-time-start-ampm');
+            if (sap) populateAmPm(sap, startH);
+        }
+
+        if (!isSingle) {
+            var endH = this.endDate ? this.endDate.getHours() : now.getHours();
+            var endM = this.endDate ? this.endDate.getMinutes() : now.getMinutes();
+            var endS = this.endDate ? this.endDate.getSeconds() : 0;
+
+            var eh = this.container.querySelector('.up-time-end-hour');
+            var em = this.container.querySelector('.up-time-end-min');
+            if (eh) populateHours(eh, endH);
+            if (em) populateMinutes(em, endM);
+
+            if (showSec) {
+                var es = this.container.querySelector('.up-time-end-sec');
+                if (es) populateSeconds(es, endS);
+            }
+            if (!is24) {
+                var eap = this.container.querySelector('.up-time-end-ampm');
+                if (eap) populateAmPm(eap, endH);
+            }
+        }
+
+        // Bind change events (only once)
+        if (!this._timeBound) {
+            this._timeBound = true;
+            var ns = this.id;
+
+            var updateTime = function (which) {
+                var hSel = self.container.querySelector('.up-time-' + which + '-hour');
+                var mSel = self.container.querySelector('.up-time-' + which + '-min');
+                var sSel = self.container.querySelector('.up-time-' + which + '-sec');
+                var apSel = self.container.querySelector('.up-time-' + which + '-ampm');
+
+                var h = hSel ? parseInt(hSel.value) : 0;
+                var m = mSel ? parseInt(mSel.value) : 0;
+                var s = sSel ? parseInt(sSel.value) : 0;
+
+                if (!is24 && apSel) {
+                    var ampm = apSel.value;
+                    if (ampm === 'PM' && h < 12) h += 12;
+                    if (ampm === 'AM' && h === 12) h = 0;
+                }
+
+                var target = (which === 'start') ? self.startDate : self.endDate;
+                if (target) {
+                    target.setHours(h, m, s, 0);
+                }
+                self._updateFooterInfo();
+            };
+
+            var timeSelects = this.container.querySelectorAll('.up-time-select');
+            for (var i = 0; i < timeSelects.length; i++) {
+                (function (sel) {
+                    Utils.on(sel, 'change', function (e) {
+                        e.stopPropagation();
+                        var which = sel.className.indexOf('start') !== -1 ? 'start' : 'end';
+                        updateTime(which);
+                    }, ns);
+                })(timeSelects[i]);
+            }
+        }
+    };
+
     // ─── Render Accounting Pane ────────────────────────────────────────
     UniversalPicker.prototype._renderAccountingPane = function (container, config) {
         var self = this;
@@ -1215,11 +1482,21 @@
     };
 
     UniversalPicker.prototype._selectDate = function (date) {
+        // Preserve time component from previous selection
+        if (this.options.timePicker) {
+            var now = new Date();
+            if (this.startDate) {
+                date.setHours(this.startDate.getHours(), this.startDate.getMinutes(), this.startDate.getSeconds(), 0);
+            } else {
+                date.setHours(now.getHours(), now.getMinutes(), 0, 0);
+            }
+        }
+
         if (this.options.singleDatePicker) {
             this.startDate = date;
             this.endDate = new Date(date);
             this._render();
-            if (this.options.autoApply) { this.apply(); }
+            if (this.options.autoApply && !this.options.timePicker) { this.apply(); }
             this._fireEvent('select', { startDate: this.startDate, endDate: this.endDate });
             return;
         }
@@ -1234,7 +1511,12 @@
             } else {
                 this.endDate = date;
             }
-            if (this.options.autoApply) { this.apply(); }
+            // Preserve end time
+            if (this.options.timePicker && this.endDate) {
+                var now = new Date();
+                this.endDate.setHours(now.getHours(), now.getMinutes(), 0, 0);
+            }
+            if (this.options.autoApply && !this.options.timePicker) { this.apply(); }
         }
 
         this.hoverDate = null;
@@ -1467,7 +1749,7 @@
 
 
     // Version is injected by rollup build via replace plugin
-    UniversalPicker.VERSION = '3.0.1';
+    UniversalPicker.VERSION = '3.1.0';
 
     return UniversalPicker;
 
