@@ -1,5 +1,5 @@
 /**
- * UniversalPicker.js v3.2.0
+ * UniversalPicker.js v3.2.1
  * A lightweight, zero-dependency date range picker.
  * https://github.com/farisulhaq/universal-picker
  * @license MIT
@@ -1853,7 +1853,7 @@
 
 
     // Version is injected by rollup build via replace plugin
-    UniversalPicker.VERSION = '3.2.0';
+    UniversalPicker.VERSION = '3.2.1';
 
     return UniversalPicker;
 
