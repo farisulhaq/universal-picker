@@ -1,5 +1,5 @@
 /**
- * UniversalPicker.js v3.2.0
+ * UniversalPicker.js v3.2.1
  * A lightweight, zero-dependency date range picker.
  * https://github.com/farisulhaq/universal-picker
  * @license MIT
@@ -940,7 +940,7 @@
     UniversalPicker.prototype._navigate = function (step) {
         var mode = this.options.mode;
 
-        if (mode === 'doubledate') {
+        if (mode === 'doubledate' || mode === 'periode') {
             this.viewYear += step;
         } else if (mode === 'custom' && this.activeRange === '__custom__') {
             var nextIdx = this.viewIdx + (step * this.options.showCalendars);
@@ -1853,7 +1853,7 @@
 
 
     // Version is injected by rollup build via replace plugin
-    UniversalPicker.VERSION = '3.2.0';
+    UniversalPicker.VERSION = '3.2.1';
 
     return UniversalPicker;
 

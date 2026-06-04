@@ -940,7 +940,7 @@
     UniversalPicker.prototype._navigate = function (step) {
         var mode = this.options.mode;
 
-        if (mode === 'doubledate') {
+        if (mode === 'doubledate' || mode === 'periode') {
             this.viewYear += step;
         } else if (mode === 'custom' && this.activeRange === '__custom__') {
             var nextIdx = this.viewIdx + (step * this.options.showCalendars);
