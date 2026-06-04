@@ -1,5 +1,5 @@
 /**
- * UniversalPicker.js v3.2.1
+ * UniversalPicker.js v3.2.2
  * A lightweight, zero-dependency date range picker.
  * https://github.com/farisulhaq/universal-picker
  * @license MIT
@@ -1623,7 +1623,10 @@ UniversalPicker.prototype._updateFooterInfo = function () {
     if (this.startDate && this.endDate) {
         var s = Utils.formatDate(this.startDate, fmt, locale);
         var e = Utils.formatDate(this.endDate, fmt, locale);
-        info.innerText = Utils.isSameDay(this.startDate, this.endDate) ? s : s + this.options.separator + e;
+        var sameRange = (this.options.mode === 'periode')
+            ? Utils.isSameMonth(this.startDate, this.endDate)
+            : Utils.isSameDay(this.startDate, this.endDate);
+        info.innerText = sameRange ? s : s + this.options.separator + e;
     } else if (this.startDate) {
         info.innerText = Utils.formatDate(this.startDate, fmt, locale) + ' - ...';
     } else {
@@ -1644,8 +1647,15 @@ UniversalPicker.prototype._updateInputValue = function () {
 
     if (this.startDate) {
         var s = Utils.formatDate(this.startDate, fmt, locale);
-        if (this.endDate && !Utils.isSameDay(this.startDate, this.endDate)) {
-            val = s + this.options.separator + Utils.formatDate(this.endDate, fmt, locale);
+        if (this.endDate) {
+            var sameRange = (this.options.mode === 'periode')
+                ? Utils.isSameMonth(this.startDate, this.endDate)
+                : Utils.isSameDay(this.startDate, this.endDate);
+            if (!sameRange) {
+                val = s + this.options.separator + Utils.formatDate(this.endDate, fmt, locale);
+            } else {
+                val = s;
+            }
         } else {
             val = s;
         }
@@ -1847,6 +1857,6 @@ UniversalPicker.getInstance = function (element) {
 
 
 // Version is injected by rollup build via replace plugin
-UniversalPicker.VERSION = '3.2.1';
+UniversalPicker.VERSION = '3.2.2';
 
 export { UniversalPicker as default };
