@@ -321,6 +321,41 @@
             min-height: 18px;
             word-break: break-all;
         }
+        .periode-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 4px 0 10px;
+        }
+        .periode-toggle-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--c-text-3);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-right: 4px;
+        }
+        .seg-btn {
+            padding: 5px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid var(--c-border);
+            background: #fff;
+            color: var(--c-text-3);
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+        .seg-btn:hover {
+            border-color: var(--c-primary);
+            color: var(--c-primary);
+        }
+        .seg-btn.active {
+            background: var(--c-primary);
+            color: #fff;
+            border-color: var(--c-primary);
+        }
 
         /* ── Code Block ───────────────────────────────── */
         .code-wrap {
@@ -374,6 +409,29 @@
         }
 
         /* ── API Demo ─────────────────────────────────── */
+        .api-groups {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 24px;
+        }
+        .api-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .api-group-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--c-text-3);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        .api-group-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
         .api-grid {
             display: flex;
             flex-wrap: wrap;
@@ -782,6 +840,12 @@
             <div class="preview-area">
                 <label data-i18n="periodeLabel">Periode</label>
                 <input type="text" id="input-periode" data-i18n-placeholder="periodePlaceholder" placeholder="Click to select month...">
+                <div class="periode-toggle">
+                    <span class="periode-toggle-label">monthDisplay:</span>
+                    <button class="seg-btn active" data-md="full" onclick="setMonthDisplay('full', this)">Full</button>
+                    <button class="seg-btn" data-md="short" onclick="setMonthDisplay('short', this)">Short</button>
+                    <button class="seg-btn" data-md="numeric" onclick="setMonthDisplay('numeric', this)">Numeric</button>
+                </div>
                 <div class="output-line" id="output-periode" data-i18n="periodeOutput">No period selected</div>
             </div>
         </div>
@@ -799,6 +863,11 @@
   }
 });</div>
             </div>
+            <div class="code-wrap" style="margin-top:12px">
+                <div class="code-block" style="font-size:11px"><span class="cm">// Switch monthDisplay at runtime:</span>
+periodePicker.updateOptions({ <span class="pr">monthDisplay</span>: <span class="str">'short'</span> });
+periodePicker.show();</div>
+            </div>
         </div>
     </div>
 </section>
@@ -811,7 +880,7 @@
     <div class="section-title" data-i18n="apiTitle">Programmatic Control</div>
     <div class="section-desc" data-i18n="apiDesc">All methods can be called directly. Click buttons to try on the Date Range Picker above.</div>
 
-    <div class="card">
+    <div class="card" id="card-api">
         <div class="card-header">
             <div class="card-header-left">
                 <div class="card-icon blue">&#9881;</div>
@@ -820,17 +889,76 @@
                     <div class="card-subtitle">Target: Date Range Picker</div>
                 </div>
             </div>
+            <span class="badge badge-blue">API</span>
         </div>
-        <div class="api-grid">
-            <button class="api-btn" onclick="demoSetRange()">.setDateRange()</button>
-            <button class="api-btn" onclick="demoGetRange()">.getDateRange()</button>
-            <button class="api-btn" onclick="demoShow()">.show()</button>
-            <button class="api-btn" onclick="demoHide()">.hide()</button>
-            <button class="api-btn" onclick="demoSetMin()">.setMinDate()</button>
-            <button class="api-btn" onclick="demoSetMax()">.setMaxDate()</button>
-            <button class="api-btn danger" onclick="demoDestroy()">.destroy()</button>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('api','preview')">Preview</button>
+            <button class="tab-btn" onclick="switchTab('api','code')">Code</button>
         </div>
-        <div class="api-output" id="output-api" data-i18n="apiOutput">// output will appear here</div>
+        <div class="tab-panel active" data-tab="api-preview">
+            <div class="api-groups">
+                <div class="api-group">
+                    <div class="api-group-label">Selection</div>
+                    <div class="api-group-buttons">
+                        <button class="api-btn" onclick="demoSetRange()">.setDateRange()</button>
+                        <button class="api-btn" onclick="demoGetRange()">.getDateRange()</button>
+                        <button class="api-btn" onclick="demoReset()">.reset()</button>
+                    </div>
+                </div>
+                <div class="api-group">
+                    <div class="api-group-label">Visibility</div>
+                    <div class="api-group-buttons">
+                        <button class="api-btn" onclick="demoShow()">.show()</button>
+                        <button class="api-btn" onclick="demoHide()">.hide()</button>
+                        <button class="api-btn" onclick="demoToggle()">.toggle()</button>
+                    </div>
+                </div>
+                <div class="api-group">
+                    <div class="api-group-label">Constraints</div>
+                    <div class="api-group-buttons">
+                        <button class="api-btn" onclick="demoSetMin()">.setMinDate()</button>
+                        <button class="api-btn" onclick="demoSetMax()">.setMaxDate()</button>
+                    </div>
+                </div>
+                <div class="api-group">
+                    <div class="api-group-label">Lifecycle</div>
+                    <div class="api-group-buttons">
+                        <button class="api-btn danger" onclick="demoDestroy()">.destroy()</button>
+                    </div>
+                </div>
+            </div>
+            <div class="api-output" id="output-api" data-i18n="apiOutput">// output will appear here</div>
+        </div>
+        <div class="tab-panel" data-tab="api-code">
+            <div class="code-wrap">
+                <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+                <div class="code-block"><span class="cm">// All methods are called on a picker instance</span>
+<span class="kw">var</span> picker = <span class="fn">UniversalPicker</span>.<span class="fn">getInstance</span>(<span class="str">'#element'</span>);
+
+<span class="cm">// ── Selection ─────────────────────────────────────</span>
+picker.<span class="fn">setDateRange</span>(<span class="kw">new</span> <span class="fn">Date</span>(<span class="num">2026</span>, <span class="num">0</span>, <span class="num">1</span>), <span class="kw">new</span> <span class="fn">Date</span>(<span class="num">2026</span>, <span class="num">2</span>, <span class="num">31</span>));
+<span class="kw">var</span> range = picker.<span class="fn">getDateRange</span>();
+picker.<span class="fn">setStartDate</span>(<span class="kw">new</span> <span class="fn">Date</span>(<span class="num">2026</span>, <span class="num">0</span>, <span class="num">15</span>));
+picker.<span class="fn">setEndDate</span>(<span class="kw">new</span> <span class="fn">Date</span>(<span class="num">2026</span>, <span class="num">0</span>, <span class="num">20</span>));
+picker.<span class="fn">reset</span>();
+
+<span class="cm">// ── Visibility ────────────────────────────────────</span>
+picker.<span class="fn">show</span>();
+picker.<span class="fn">hide</span>();
+picker.<span class="fn">toggle</span>();
+
+<span class="cm">// ── Constraints ───────────────────────────────────</span>
+picker.<span class="fn">setMinDate</span>(<span class="kw">new</span> <span class="fn">Date</span>(<span class="num">2020</span>, <span class="num">0</span>, <span class="num">1</span>));
+picker.<span class="fn">setMaxDate</span>(<span class="kw">new</span> <span class="fn">Date</span>(<span class="num">2030</span>, <span class="num">11</span>, <span class="num">31</span>));
+
+<span class="cm">// ── Lifecycle ─────────────────────────────────────</span>
+picker.<span class="fn">destroy</span>();
+
+<span class="cm">// ── Static helpers ────────────────────────────────</span>
+<span class="kw">var</span> inst = <span class="fn">UniversalPicker</span>.<span class="fn">getInstance</span>(<span class="str">'#element'</span>);
+<span class="obj">console</span>.<span class="fn">log</span>(<span class="fn">UniversalPicker</span>.<span class="pr">VERSION</span>);</div>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -1221,6 +1349,9 @@ var accPicker = new UniversalPicker('#input-accounting', {
     onApply: function (data) {
         document.getElementById('output-accounting').innerText =
             fmt(data.startDate) + '  ~  ' + fmt(data.endDate);
+    },
+    onReset: function () {
+        document.getElementById('output-accounting').innerText = '[reset]';
     }
 });
 
@@ -1262,6 +1393,13 @@ var periodePicker = new UniversalPicker('#input-periode', {
     }
 });
 
+function setMonthDisplay(mode, btn) {
+    periodePicker.updateOptions({ monthDisplay: mode });
+    document.querySelectorAll('.seg-btn').forEach(function (b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    if (!periodePicker.isShowing) periodePicker.show();
+}
+
 // ─── 6. API Playground ─────────────────────────────────────────────
 function apiLog(msg) {
     document.getElementById('output-api').innerText = '> ' + msg;
@@ -1283,6 +1421,10 @@ function demoHide() {
     rangePicker.hide();
     apiLog('hide() — picker closed');
 }
+function demoToggle() {
+    rangePicker.toggle();
+    apiLog('toggle() — picker ' + (rangePicker.isShowing ? 'opened' : 'closed'));
+}
 function demoSetMin() {
     rangePicker.setMinDate(new Date(2026, 3, 1));
     apiLog('setMinDate(2026-04-01) — dates before April disabled');
@@ -1295,10 +1437,17 @@ function demoDestroy() {
     rangePicker.destroy();
     apiLog('destroy() — picker removed. Click input to verify.');
 }
+function demoReset() {
+    rangePicker.reset();
+    apiLog('reset() — startDate/endDate cleared. Picker still open if showing.');
+}
 
 // ─── DOM Events (console) ──────────────────────────────────────────
 document.getElementById('input-range').addEventListener('up.apply', function (e) {
     console.log('[up.apply]', e.detail);
+});
+document.getElementById('input-range').addEventListener('up.reset', function (e) {
+    console.log('[up.reset]', e.detail);
 });
 
 // ─── Apply saved language on load ──────────────────────────────────
