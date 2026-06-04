@@ -4,7 +4,7 @@
  */
 
 export var DEFAULTS = {
-    // Mode: 'default' | 'custom' | 'doubledate'
+    // Mode: 'default' | 'custom' | 'doubledate' | 'periode'
     mode: 'default',
 
     // Start and end date
@@ -54,6 +54,12 @@ export var DEFAULTS = {
     // Custom title for the nav bar (null = auto-generate based on mode)
     title: null,
 
+    // Month display format for 'periode' mode: 'full' | 'short' | 'numeric'
+    monthDisplay: 'full',
+
+    // Show Reset button in footer
+    showReset: true,
+
     // Accounting config for 'custom' mode
     accountingConfig: [],
 
@@ -79,6 +85,7 @@ export var DEFAULTS = {
         direction: 'ltr',
         applyLabel: 'Apply',
         cancelLabel: 'Cancel',
+        resetLabel: 'Reset',
         customRangeLabel: 'Custom Range',
         monthNames: ['January', 'February', 'March', 'April', 'May', 'June',
             'July', 'August', 'September', 'October', 'November', 'December'],

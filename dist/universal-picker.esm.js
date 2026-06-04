@@ -1,5 +1,5 @@
 /**
- * UniversalPicker.js v3.1.0
+ * UniversalPicker.js v3.2.0
  * A lightweight, zero-dependency date range picker.
  * https://github.com/farisulhaq/universal-picker
  * @license MIT
@@ -86,6 +86,15 @@ var Utils = {
     },
 
     /**
+     * Check if two dates are in the same month.
+     */
+    isSameMonth: function (a, b) {
+        if (!a || !b) return false;
+        return a.getFullYear() === b.getFullYear() &&
+            a.getMonth() === b.getMonth();
+    },
+
+    /**
      * Check if date is between start and end (exclusive).
      */
     isBetween: function (date, start, end) {
@@ -161,7 +170,7 @@ var Utils = {
  */
 
 var DEFAULTS = {
-    // Mode: 'default' | 'custom' | 'doubledate'
+    // Mode: 'default' | 'custom' | 'doubledate' | 'periode'
     mode: 'default',
 
     // Start and end date
@@ -211,6 +220,12 @@ var DEFAULTS = {
     // Custom title for the nav bar (null = auto-generate based on mode)
     title: null,
 
+    // Month display format for 'periode' mode: 'full' | 'short' | 'numeric'
+    monthDisplay: 'full',
+
+    // Show Reset button in footer
+    showReset: true,
+
     // Accounting config for 'custom' mode
     accountingConfig: [],
 
@@ -236,6 +251,7 @@ var DEFAULTS = {
         direction: 'ltr',
         applyLabel: 'Apply',
         cancelLabel: 'Cancel',
+        resetLabel: 'Reset',
         customRangeLabel: 'Custom Range',
         monthNames: ['January', 'February', 'March', 'April', 'May', 'June',
             'July', 'August', 'September', 'October', 'November', 'December'],
@@ -564,6 +580,15 @@ function injectStyles(theme) {
         '.up-btn-cancel:hover {',
         '  background: #e2e8f0;',
         '}',
+        '.up-btn-reset {',
+        '  background: transparent;',
+        '  color: #94a3b8;',
+        '  border: 1px solid ' + theme.borderColor + ';',
+        '}',
+        '.up-btn-reset:hover {',
+        '  background: ' + theme.sidebarBg + ';',
+        '  color: #64748b;',
+        '}',
         '',
         '.up-dropdown-row {',
         '  display: flex;',
@@ -757,7 +782,7 @@ UniversalPicker.prototype._build = function () {
     html += '</div>';
 
     // Time picker row
-    if (opts.timePicker) {
+    if (opts.timePicker && opts.mode !== 'periode') {
         html += '<div class="up-time-row">';
         html += '<div class="up-time-group">';
         html += '<label class="up-time-label">Start</label>';
@@ -772,7 +797,7 @@ UniversalPicker.prototype._build = function () {
             html += '<select class="up-select up-time-select up-time-start-ampm"></select>';
         }
         html += '</div>';
-        if (!opts.singleDatePicker && opts.mode !== 'doubledate') {
+        if (!opts.singleDatePicker && opts.mode !== 'doubledate' && opts.mode !== 'periode') {
             html += '<div class="up-time-group">';
             html += '<label class="up-time-label">End</label>';
             html += '<select class="up-select up-time-select up-time-end-hour"></select>';
@@ -794,6 +819,9 @@ UniversalPicker.prototype._build = function () {
         html += '<div class="up-footer">';
         html += '<div class="up-footer-info"></div>';
         html += '<div class="up-footer-actions">';
+        if (opts.showReset) {
+            html += '<button type="button" class="up-btn up-btn-reset">' + this._escapeHtml(locale.resetLabel) + '</button>';
+        }
         html += '<button type="button" class="up-btn up-btn-cancel">' + this._escapeHtml(locale.cancelLabel) + '</button>';
         html += '<button type="button" class="up-btn up-btn-apply">' + this._escapeHtml(locale.applyLabel) + '</button>';
         html += '</div>';
@@ -854,6 +882,14 @@ UniversalPicker.prototype._bindEvents = function () {
         Utils.on(cancelBtn, 'click', function (e) {
             e.stopPropagation();
             self.cancel();
+        }, ns);
+    }
+
+    var resetBtn = this.container.querySelector('.up-btn-reset');
+    if (resetBtn) {
+        Utils.on(resetBtn, 'click', function (e) {
+            e.stopPropagation();
+            self.reset();
         }, ns);
     }
 
@@ -958,12 +994,14 @@ UniversalPicker.prototype._render = function () {
     panes.innerHTML = '';
     ddGrid.innerHTML = '';
 
-    if (sidebar) { sidebar.style.display = (mode === 'doubledate') ? 'none' : ''; }
+    if (sidebar) { sidebar.style.display = (mode === 'doubledate' || mode === 'periode') ? 'none' : ''; }
     if (nav) nav.style.display = '';
     if (content) content.style.display = '';
 
     if (mode === 'doubledate') {
         this._renderDoubleDate(title, panes, ddGrid);
+    } else if (mode === 'periode') {
+        this._renderPeriode(title, panes, ddGrid);
     } else if (mode === 'custom') {
         this._renderCustom(title, panes, ddGrid);
     } else {
@@ -1062,6 +1100,64 @@ UniversalPicker.prototype._renderDoubleDate = function (titleEl, panesEl, ddGrid
             };
             ddGridEl.appendChild(btn);
         })(i);
+    }
+};
+
+// ─── Render Periode (Month-only grid) ──────────────────────────────
+UniversalPicker.prototype._renderPeriode = function (titleEl, panesEl, ddGridEl) {
+    var self = this;
+    var opts = this.options;
+    var locale = opts.locale;
+    var display = opts.monthDisplay || 'full';
+
+    panesEl.style.display = 'none';
+    ddGridEl.style.display = 'grid';
+    titleEl.innerText = (opts.title || 'PERIODE') + ' ' + this.viewYear;
+
+    var monthLabel = function (m) {
+        if (display === 'short') return locale.monthNamesShort[m];
+        if (display === 'numeric') return (m + 1 < 10 ? '0' : '') + (m + 1);
+        return locale.monthNames[m];
+    };
+
+    for (var m = 0; m < 12; m++) {
+        (function (month) {
+            var btn = document.createElement('div');
+            btn.className = 'up-dd-item';
+            btn.innerText = monthLabel(month);
+
+            var first = new Date(self.viewYear, month, 1);
+            var last = new Date(self.viewYear, month + 1, 0);
+
+            // Disable if month is fully outside minDate/maxDate
+            if (self.minDate && last < self.minDate) {
+                btn.classList.add('up-disabled');
+            } else if (self.maxDate && first > self.maxDate) {
+                btn.classList.add('up-disabled');
+            } else if (opts.isInvalidDate) {
+                // Disable if all days in month are invalid
+                var anyValid = false;
+                for (var d = 1; d <= last.getDate() && !anyValid; d++) {
+                    if (!opts.isInvalidDate(new Date(self.viewYear, month, d))) anyValid = true;
+                }
+                if (!anyValid) btn.classList.add('up-disabled');
+            }
+
+            if (self.startDate && Utils.isSameMonth(first, self.startDate)) {
+                btn.classList.add('up-dd-selected');
+            }
+
+            btn.onclick = function (e) {
+                e.stopPropagation();
+                if (btn.classList.contains('up-disabled')) return;
+                self.startDate = first;
+                self.endDate = last;
+                self._render();
+                if (self.options.autoApply) { self.apply(); }
+            };
+
+            ddGridEl.appendChild(btn);
+        })(m);
     }
 };
 
@@ -1233,7 +1329,7 @@ UniversalPicker.prototype._renderTimePicker = function () {
     var is24 = opts.timePicker24Hour;
     var inc = opts.timePickerIncrement || 1;
     var showSec = opts.timePickerSeconds;
-    var isSingle = opts.singleDatePicker || opts.mode === 'doubledate';
+    var isSingle = opts.singleDatePicker || opts.mode === 'doubledate' || opts.mode === 'periode';
 
     // Populate hour select
     var populateHours = function (sel, selectedHour) {
@@ -1677,6 +1773,14 @@ UniversalPicker.prototype.cancel = function () {
     this.hide();
 };
 
+UniversalPicker.prototype.reset = function () {
+    this.startDate = null;
+    this.endDate = null;
+    this._updateInputValue();
+    if (this.isShowing) { this._render(); }
+    this._fireEvent('reset', { startDate: null, endDate: null });
+};
+
 UniversalPicker.prototype.setDateRange = function (startDate, endDate) {
     this.startDate = startDate ? new Date(startDate) : null;
     this.endDate = endDate ? new Date(endDate) : (this.startDate ? new Date(this.startDate) : null);
@@ -1743,6 +1847,6 @@ UniversalPicker.getInstance = function (element) {
 
 
 // Version is injected by rollup build via replace plugin
-UniversalPicker.VERSION = '3.1.0';
+UniversalPicker.VERSION = '3.2.0';
 
 export { UniversalPicker as default };

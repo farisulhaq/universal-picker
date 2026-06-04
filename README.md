@@ -22,7 +22,7 @@ A lightweight, zero-dependency date range picker library for the web. Supports c
 - **Responsive**: Adapts to mobile screens automatically
 - **Auto-positioning**: Smart positioning relative to viewport
 - **Programmatic API**: Full control via JavaScript methods
-- **Events & Callbacks**: `onShow`, `onHide`, `onApply`, `onCancel`, `onChange`, `onSelect`
+- **Events & Callbacks**: `onShow`, `onHide`, `onApply`, `onCancel`, `onChange`, `onSelect`, `onReset`
 - **CDN Ready**: UMD + ESM builds (works with `<script>`, AMD, CommonJS, ES Modules)
 - **TypeScript**: Full type definitions included
 - **Zero Dependencies**: No jQuery, no external libraries
@@ -200,11 +200,37 @@ Displays a grid of 12 "double dates" (1/1, 2/2, 3/3, ... 12/12) for the selected
 </script>
 ```
 
+### Periode Mode
+
+Displays a 3-column grid of 12 months for the selected year. Clicking a month sets the range to the **1st through the last day of that month** — perfect for monthly reports and accounting periods.
+
+```html
+<input type="text" id="periode" placeholder="Select month" />
+
+<script>
+  var picker = new UniversalPicker('#periode', {
+    mode: 'periode',
+    format: 'MMMM YYYY',
+    monthDisplay: 'full',     // 'full' | 'short' | 'numeric'
+    title: 'Periode',
+    autoApply: true,
+    onApply: function (data) {
+      console.log('Periode:', data.startDate, '~', data.endDate);
+    }
+  });
+</script>
+```
+
+**`monthDisplay` options:**
+- `'full'` (default) — `January`, `February`, ...
+- `'short'` — `Jan`, `Feb`, ...
+- `'numeric'` — `01`, `02`, ...
+
 ## Options
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `mode` | `string` | `'default'` | Picker mode: `'default'`, `'custom'`, or `'doubledate'` |
+| `mode` | `string` | `'default'` | Picker mode: `'default'`, `'custom'`, `'doubledate'`, or `'periode'` |
 | `startDate` | `Date\|string` | `null` | Initial start date |
 | `endDate` | `Date\|string` | `null` | Initial end date |
 | `minDate` | `Date\|string` | `null` | Minimum selectable date |
@@ -222,6 +248,9 @@ Displays a grid of 12 "double dates" (1/1, 2/2, 3/3, ... 12/12) for the selected
 | `drops` | `string` | `'auto'` | Drop direction: `'up'`, `'down'`, `'auto'` |
 | `ranges` | `object` | `null` | Predefined ranges for the sidebar (see example above) |
 | `accountingConfig` | `array` | `[]` | Accounting period configuration for `'custom'` mode |
+| `title` | `string` | `null` | Custom title for the picker header. `null` = auto-generated from mode |
+| `monthDisplay` | `string` | `'full'` | Month display format for `'periode'` mode: `'full'`, `'short'`, or `'numeric'` |
+| `showReset` | `boolean` | `true` | Show a Reset button in the footer (clears the current value, picker stays open) |
 | `theme` | `object` | *(see below)* | Theme/color customization |
 | `locale` | `object` | *(see below)* | Locale/language customization |
 | `isInvalidDate` | `function` | `null` | Function `(date) => boolean` to disable specific dates |
@@ -248,6 +277,7 @@ Displays a grid of 12 "double dates" (1/1, 2/2, 3/3, ... 12/12) for the selected
   direction: 'ltr',
   applyLabel: 'Apply',
   cancelLabel: 'Cancel',
+  resetLabel: 'Reset',
   customRangeLabel: 'Custom Range',
   monthNames: ['January', 'February', 'March', 'April', 'May', 'June',
                'July', 'August', 'September', 'October', 'November', 'December'],
@@ -301,6 +331,9 @@ var picker = new UniversalPicker('#mydate', {
   },
   onSelect: function (data) {
     console.log('Date clicked:', data.startDate);
+  },
+  onReset: function (data) {
+    console.log('Reset — startDate/endDate are null');
   }
 });
 ```
@@ -326,6 +359,10 @@ input.addEventListener('up.show', function () {
 
 input.addEventListener('up.hide', function () {
   console.log('Picker hidden');
+});
+
+input.addEventListener('up.reset', function (e) {
+  console.log('Reset — startDate/endDate are null');
 });
 ```
 
@@ -364,6 +401,13 @@ Revert to previous selection and close.
 
 ```js
 picker.cancel();
+```
+
+### `reset()`
+Clear the current selection (`startDate` and `endDate` become `null`). The picker stays open so the user can pick a new range. Fires the `onReset` callback and the `up.reset` DOM event.
+
+```js
+picker.reset();
 ```
 
 ### `setDateRange(startDate, endDate)`

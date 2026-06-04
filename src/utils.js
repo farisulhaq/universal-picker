@@ -80,6 +80,15 @@ export var Utils = {
     },
 
     /**
+     * Check if two dates are in the same month.
+     */
+    isSameMonth: function (a, b) {
+        if (!a || !b) return false;
+        return a.getFullYear() === b.getFullYear() &&
+            a.getMonth() === b.getMonth();
+    },
+
+    /**
      * Check if date is between start and end (exclusive).
      */
     isBetween: function (date, start, end) {

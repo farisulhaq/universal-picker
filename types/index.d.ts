@@ -16,6 +16,7 @@ export interface UniversalPickerLocale {
     direction?: 'ltr' | 'rtl';
     applyLabel?: string;
     cancelLabel?: string;
+    resetLabel?: string;
     customRangeLabel?: string;
     monthNames?: string[];
     monthNamesShort?: string[];
@@ -36,7 +37,7 @@ export interface DateRangeData {
 }
 
 export interface UniversalPickerOptions {
-    mode?: 'default' | 'custom' | 'doubledate';
+    mode?: 'default' | 'custom' | 'doubledate' | 'periode';
     startDate?: Date | string | null;
     endDate?: Date | string | null;
     minDate?: Date | string | null;
@@ -56,6 +57,10 @@ export interface UniversalPickerOptions {
     accountingConfig?: AccountingPeriod[];
     /** Custom title for the nav bar (null = auto-generate based on mode) */
     title?: string | null;
+    /** Month display format for 'periode' mode: 'full' | 'short' | 'numeric' */
+    monthDisplay?: 'full' | 'short' | 'numeric';
+    /** Show Reset button in footer (default: true) */
+    showReset?: boolean;
     /** Enable time picker */
     timePicker?: boolean;
     /** Use 24-hour format (default: true) */
@@ -76,6 +81,7 @@ export interface UniversalPickerOptions {
     onCancel?: (data: DateRangeData) => void;
     onChange?: (data: DateRangeData) => void;
     onSelect?: (data: DateRangeData) => void;
+    onReset?: (data: DateRangeData) => void;
 }
 
 declare class UniversalPicker {
@@ -108,6 +114,8 @@ declare class UniversalPicker {
     apply(): void;
     /** Cancel and revert to previous selection */
     cancel(): void;
+    /** Clear the current selection (picker stays open) */
+    reset(): void;
     /** Set the date range programmatically */
     setDateRange(startDate: Date | string | null, endDate?: Date | string | null): void;
     /** Set start date */
